@@ -1,0 +1,1728 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ars Rhetorica</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=DM+Mono:wght@400;500&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+:root{
+  --ink:#1a1208;--parchment:#f5efe0;--cream:#faf6ee;
+  --gold:#c8962a;--gold-light:#e8b84b;--gold-pale:#f5e8c8;
+  --red:#8b2318;--green:#1e5c2a;--border:#c8a96e;--muted:#7a6a50;
+  --sidebar:280px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--cream);color:var(--ink);font-family:'Crimson Pro',Georgia,serif;min-height:100vh;font-size:18px;}
+
+/* NAV */
+nav{background:var(--ink);display:flex;align-items:center;padding:0 1.5rem;position:sticky;top:0;z-index:300;border-bottom:3px solid var(--gold);}
+.logo{font-family:'Playfair Display',serif;font-size:1rem;color:var(--gold);font-weight:900;letter-spacing:.06em;padding:.9rem 1.2rem .9rem 0;border-right:1px solid #3a2f20;margin-right:.8rem;white-space:nowrap;}
+nav button{background:none;border:none;color:#c8b898;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:1rem .9rem;cursor:pointer;transition:color .2s;position:relative;}
+nav button::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--gold);transform:scaleX(0);transition:transform .2s;}
+nav button:hover{color:var(--gold-light);}nav button:hover::after{transform:scaleX(1);}
+nav button.active{color:var(--gold);}nav button.active::after{transform:scaleX(1);}
+.mode-bar{background:var(--parchment);border-bottom:1px solid var(--border);padding:.5rem 1.5rem;display:flex;align-items:center;gap:1rem;}
+.mode-label{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.mode-toggle{display:flex;border:1.5px solid var(--border);overflow:hidden;}
+.mode-toggle button{background:none;border:none;padding:.4rem 1rem;font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;color:var(--muted);transition:all .2s;}
+.mode-toggle button.active{background:var(--ink);color:var(--gold);}
+.progress-bar{background:#2d2010;height:3px;}
+.progress-fill{height:100%;background:var(--gold);transition:width .4s;}
+
+/* PAGES */
+.page{display:none;}.page.active{display:block;}
+
+/* HERO */
+.hero{background:var(--ink);color:var(--parchment);padding:2.5rem 2rem 2rem;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'❝';position:absolute;font-size:16rem;color:rgba(200,150,42,.05);top:-2rem;left:-1rem;font-family:'Playfair Display',serif;pointer-events:none;}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,4vw,2.8rem);font-weight:900;color:var(--parchment);position:relative;}
+.hero h1 em{font-style:italic;color:var(--gold-light);}
+.hero .sub{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-top:.6rem;}
+
+/* LAYOUT : sidebar + main */
+.layout{display:flex;align-items:flex-start;min-height:calc(100vh - 130px);}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);flex-shrink:0;position:sticky;top:82px;background:var(--ink);min-height:calc(100vh - 82px);padding:1.2rem;overflow-y:auto;max-height:calc(100vh - 82px);}
+.sidebar-section{margin-bottom:1.2rem;border-bottom:1px solid #3a2f20;padding-bottom:1rem;}
+.sidebar-section:last-child{border-bottom:none;}
+.sb-title{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;}
+.sb-empty{font-family:'DM Mono',monospace;font-size:.58rem;color:#4a3f30;font-style:italic;}
+.sb-item{font-size:.78rem;color:#c8b898;padding:.25rem 0;border-bottom:1px solid #2a2010;line-height:1.4;}
+.sb-item:last-child{border-bottom:none;}
+.sb-item .sb-label{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;display:block;}
+.sb-item .sb-label.favorable{color:#6abf6a;}
+.sb-item .sb-label.indecis{color:var(--gold);}
+.sb-item .sb-label.defavorable{color:#d4756a;}
+.sb-item .sb-label.fort{color:#d4756a;}
+.sb-item .sb-label.moyen{color:var(--gold);}
+.sb-item .sb-label.faible{color:#6abf6a;}
+.sb-badge{font-family:'DM Mono',monospace;font-size:.52rem;padding:.1rem .35rem;border-radius:0;}
+.sb-badge.fort{background:#4a1510;color:#d4756a;}
+.sb-badge.moyen{background:#3a2f10;color:var(--gold);}
+.sb-badge.faible{background:#1a3a1a;color:#6abf6a;}
+.sb-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:.52rem;background:#2a2010;color:#c8a96e;padding:.1rem .4rem;margin:.1rem .1rem 0 0;}
+
+/* MAIN CONTENT */
+.main{flex:1;min-width:0;padding:2rem;}
+.step{display:none;animation:fadeSlide .3s ease;}
+.step.active{display:block;}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* STEP HEADER */
+.step-header{margin-bottom:1.5rem;}
+.step-meta{display:flex;align-items:center;gap:.6rem;margin-bottom:.4rem;}
+.step-num{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;}
+.step-question{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;color:var(--ink);line-height:1.3;}
+.step-hint{font-size:1rem;font-style:italic;color:var(--muted);margin-top:.4rem;line-height:1.6;}
+
+/* BREADCRUMB */
+.breadcrumb{display:flex;flex-wrap:wrap;gap:.35rem;align-items:center;margin-bottom:1.5rem;padding-bottom:.8rem;border-bottom:1px solid var(--border);}
+.crumb{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.07em;background:#ede4d0;padding:.2rem .55rem;color:var(--muted);}
+.crumb-arrow{color:var(--border);font-size:.75rem;}
+.btn-back{background:none;border:1px solid var(--border);padding:.3rem .7rem;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all .2s;margin-left:auto;}
+.btn-back:hover{border-color:var(--gold);color:var(--ink);}
+
+/* CHOICES */
+.choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.8rem;margin-bottom:1.2rem;}
+.choices.cols2{grid-template-columns:repeat(auto-fit,minmax(260px,1fr));}
+.choice-btn{background:var(--parchment);border:1.5px solid var(--border);padding:1.1rem 1.2rem;cursor:pointer;text-align:left;font-family:'Crimson Pro',serif;font-size:1rem;color:var(--ink);line-height:1.5;transition:all .2s;}
+.choice-btn:hover{border-color:var(--gold);background:#fdf8ed;box-shadow:3px 3px 0 var(--gold);transform:translate(-1px,-1px);}
+.choice-btn.selected{border-color:var(--gold);background:#fdf8ed;box-shadow:3px 3px 0 var(--gold);}
+.choice-btn .clabel{font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:.35rem;}
+.choice-btn .cdesc{font-size:.88rem;color:var(--muted);margin-top:.25rem;font-style:italic;}
+
+/* FORM ELEMENTS */
+.field-group{margin-bottom:1rem;}
+.flabel{font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:.3rem;}
+textarea,input[type=text]{border:1.5px solid var(--border);background:var(--cream);padding:.55rem .8rem;font-family:'Crimson Pro',serif;font-size:.9rem;color:var(--ink);outline:none;width:100%;transition:border-color .2s;line-height:1.6;}
+textarea:focus,input[type=text]:focus{border-color:var(--gold);}
+textarea{resize:vertical;min-height:70px;}
+select{border:1.5px solid var(--border);background:var(--cream);padding:.5rem .7rem;font-family:'DM Mono',monospace;font-size:.62rem;color:var(--ink);outline:none;cursor:pointer;transition:border-color .2s;}
+select:focus{border-color:var(--gold);}
+
+/* PANELS */
+.panel{background:var(--parchment);border:2px solid var(--gold);padding:1.3rem;margin-bottom:1rem;}
+.panel h4{font-family:'DM Mono',monospace;font-size:.75rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.9rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);}
+.info-box{background:#eef4ff;border:2px solid #7a9fd4;padding:1rem 1.2rem;margin:.8rem 0;font-size:.95rem;color:#1a3060;line-height:1.7;}
+.info-box strong{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.3rem;}
+.warn{background:#f9ede9;border:2px solid #d4856b;padding:1rem 1.2rem;margin:.8rem 0;font-size:.95rem;color:var(--red);line-height:1.7;}
+.warn strong{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.3rem;}
+
+/* ARG BUILDER */
+.arg-two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1rem;}
+.arg-input-row{display:flex;gap:.6rem;margin-bottom:.6rem;}
+.arg-input-row input{flex:1;}
+.arg-input-row select{flex-shrink:0;width:90px;}
+.btn-add{background:var(--ink);color:var(--gold);border:none;padding:.52rem .9rem;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;cursor:pointer;flex-shrink:0;transition:background .2s;}
+.btn-add:hover{background:#2d2010;}
+.arg-list{display:flex;flex-direction:column;gap:.4rem;min-height:1.5rem;}
+.arg-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .8rem;border:1px solid var(--border);animation:fadeSlide .2s ease;}
+.arg-item.fort{background:#f0ede8;border-left:4px solid var(--red);}
+.arg-item.moyen{background:#f5f0e5;border-left:4px solid var(--gold);}
+.arg-item.faible{background:#edf0ed;border-left:4px solid var(--green);}
+.arg-item .atext{flex:1;font-size:1rem;line-height:1.4;}
+.arg-item .abadge{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;padding:.12rem .4rem;flex-shrink:0;}
+.arg-item.fort .abadge{background:#f0d0cc;color:var(--red);}
+.arg-item.moyen .abadge{background:#ede4d0;color:var(--muted);}
+.arg-item.faible .abadge{background:#d0e8d0;color:var(--green);}
+.btn-del{background:none;border:none;cursor:pointer;color:var(--muted);font-size:.95rem;padding:0 .15rem;transition:color .2s;flex-shrink:0;}
+.btn-del:hover{color:var(--red);}
+.arg-empty{font-family:'DM Mono',monospace;font-size:.6rem;color:var(--muted);text-align:center;padding:.8rem;font-style:italic;}
+
+/* TARGET BUILDER */
+.target-type-row{display:flex;gap:.6rem;margin-bottom:.8rem;}
+.ttype-btn{background:var(--parchment);border:1.5px solid var(--border);padding:.5rem .9rem;cursor:pointer;font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);transition:all .2s;}
+.ttype-btn:hover{border-color:var(--gold);color:var(--ink);}
+.ttype-btn.selected{border-color:var(--gold);background:#fdf8ed;color:var(--gold);}
+.target-form{display:none;background:var(--parchment);border:1px solid var(--border);padding:1rem;margin-bottom:.8rem;}
+.target-form.active{display:block;}
+.target-form-row{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem;}
+.target-list{display:flex;flex-direction:column;gap:.4rem;}
+.titem{background:var(--parchment);border:1px solid var(--border);padding:.6rem .9rem;display:flex;gap:.7rem;align-items:flex-start;}
+.titem.favorable{border-left:4px solid var(--green);}
+.titem.indecis{border-left:4px solid var(--gold);}
+.titem.defavorable{border-left:4px solid var(--red);}
+.titem-body{flex:1;}
+.titem-body strong{font-size:.88rem;font-weight:600;}
+.titem-body .tprofil{font-family:'DM Mono',monospace;font-size:.58rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:.15rem 0;}
+.titem-body .tcomment{font-size:.8rem;font-style:italic;color:var(--muted);line-height:1.4;margin-top:.15rem;}
+.tbadge{font-family:'DM Mono',monospace;font-size:.55rem;text-transform:uppercase;padding:.15rem .45rem;flex-shrink:0;}
+.tbadge.favorable{background:#e0ede0;color:var(--green);}
+.tbadge.indecis{background:#ede4d0;color:var(--muted);}
+.tbadge.defavorable{background:#f5e0de;color:var(--red);}
+
+/* TACTIC CARDS */
+.tactic-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin:1rem 0;}
+.tactic-card{background:var(--parchment);border:1.5px solid var(--border);padding:1rem;cursor:pointer;transition:all .2s;position:relative;}
+.tactic-card:hover{border-color:var(--gold);box-shadow:3px 3px 0 var(--gold);transform:translate(-1px,-1px);}
+.tactic-card.selected{border-color:var(--gold);background:#fdf8ed;box-shadow:3px 3px 0 var(--gold);}
+.tactic-card.selected::after{content:'✓';position:absolute;top:.5rem;right:.7rem;color:var(--gold);font-size:.9rem;}
+.tactic-card h5{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;margin-bottom:.35rem;}
+.tactic-card p{font-size:.78rem;color:var(--muted);line-height:1.5;}
+.teffect{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;color:var(--green);margin-top:.4rem;display:block;}
+.trisk{font-family:'DM Mono',monospace;font-size:.55rem;letter-spacing:.06em;text-transform:uppercase;color:var(--red);margin-top:.15rem;display:block;}
+
+/* ROLE CARDS — two selectable */
+.role-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.7rem;}
+.role-card{background:var(--parchment);border:1.5px solid var(--border);padding:.9rem 1rem;cursor:pointer;transition:all .2s;position:relative;}
+.role-card:hover{border-color:var(--gold);background:#fdf8ed;}
+.role-card.primary{border-color:var(--gold);background:#fdf8ed;box-shadow:3px 3px 0 var(--gold);}
+.role-card.secondary{border-color:#a07820;background:#faf3e0;box-shadow:2px 2px 0 #a07820;}
+.role-card .rlabel{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:.3rem;}
+.role-card h5{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;margin-bottom:.2rem;}
+.role-card p{font-size:.75rem;color:var(--muted);line-height:1.4;}
+.role-badge{position:absolute;top:.4rem;right:.5rem;font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.08em;text-transform:uppercase;padding:.12rem .4rem;}
+.role-badge.primary{background:var(--gold);color:var(--ink);}
+.role-badge.secondary{background:#a07820;color:var(--parchment);}
+.role-hint{font-family:'DM Mono',monospace;font-size:.62rem;color:var(--muted);font-style:italic;margin-bottom:.8rem;}
+
+/* LEVIER BUILDER */
+.levier-list{display:flex;flex-direction:column;gap:.5rem;margin:1rem 0;}
+.levier-item{background:var(--parchment);border:1px solid var(--border);padding:.8rem 1rem;display:flex;gap:.8rem;align-items:flex-start;cursor:pointer;transition:all .2s;}
+.levier-item:hover{border-color:var(--gold);}
+.levier-item.selected{border-color:var(--gold);background:#fdf8ed;border-left:4px solid var(--gold);}
+.lcheck{width:1.1rem;height:1.1rem;border:1.5px solid var(--border);flex-shrink:0;margin-top:.1rem;display:flex;align-items:center;justify-content:center;font-size:.65rem;color:var(--gold);}
+.levier-item.selected .lcheck{background:var(--gold);color:var(--ink);border-color:var(--gold);}
+.levier-body{flex:1;}
+.levier-body h5{font-size:1rem;font-weight:600;margin-bottom:.2rem;}
+.levier-body p{font-size:.9rem;color:var(--muted);line-height:1.5;}
+.levier-assoc{margin-top:.6rem;display:none;}
+.levier-item.selected .levier-assoc{display:block;}
+.levier-assoc select{font-size:.62rem;width:100%;}
+.lmeta{display:flex;gap:.35rem;margin-top:.35rem;flex-wrap:wrap;}
+.lbadge{font-family:'DM Mono',monospace;font-size:.52rem;letter-spacing:.06em;padding:.12rem .4rem;}
+.lbadge.r1{background:#e0ede0;color:var(--green);}
+.lbadge.r2{background:#ede4d0;color:var(--muted);}
+.lbadge.r3{background:#f0d0cc;color:var(--red);}
+.lbadge.artifice{background:#e8e0f0;color:#4a2080;}
+
+/* COUNTER ARG */
+.counter-row{background:var(--parchment);border:1px solid var(--border);margin-bottom:.7rem;overflow:hidden;}
+.counter-head{background:#f0e8d8;border-bottom:1px solid var(--border);padding:.65rem .9rem;}
+.counter-head .ch-label{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.2rem;}
+.counter-head .ch-text{font-family:'Playfair Display',serif;font-size:.95rem;font-weight:700;color:var(--ink);line-height:1.4;}
+.counter-body{padding:.8rem .9rem;display:flex;flex-direction:column;gap:.5rem;}
+.counter-body label{font-family:'DM Mono',monospace;font-size:.56rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+
+/* THESIS */
+.thesis-part{background:var(--parchment);border:1px solid var(--border);padding:1.1rem;margin-bottom:.8rem;}
+.thesis-part h4{font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;display:flex;align-items:center;gap:.5rem;}
+.tnum{width:1.4rem;height:1.4rem;background:var(--gold);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0;}
+.thesis-part .tips{font-size:.95rem;color:var(--muted);font-style:italic;margin-bottom:.6rem;line-height:1.7;}
+textarea,input[type=text]{border:1.5px solid var(--border);background:var(--cream);padding:.65rem .9rem;font-family:'Crimson Pro',serif;font-size:1rem;color:var(--ink);outline:none;width:100%;transition:border-color .2s;line-height:1.7;}
+.counter-body label{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.counter-head .ch-label{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem;}
+.counter-head .ch-text{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--ink);line-height:1.4;}
+.tactic-card h5{font-family:'Playfair Display',serif;font-size:1.05rem;font-weight:700;margin-bottom:.35rem;}
+.tactic-card p{font-size:.9rem;color:var(--muted);line-height:1.5;}
+.tcontent p{font-size:1rem;color:#3d3020;line-height:1.8;margin-bottom:.6rem;}
+.checklist li{font-size:.95rem;padding:.3rem 0;display:flex;gap:.5rem;align-items:flex-start;color:var(--ink);line-height:1.5;}
+
+/* SECTION DIVIDER */
+.sdiv{display:flex;align-items:center;gap:.8rem;margin:1.5rem 0 1rem;}
+.sdiv::before,.sdiv::after{content:'';flex:1;height:1px;background:var(--border);}
+.sdiv span{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.18em;color:var(--muted);text-transform:uppercase;white-space:nowrap;}
+
+/* BUTTONS */
+.btn-next{background:var(--ink);color:var(--gold);border:none;padding:.7rem 1.8rem;font-family:'DM Mono',monospace;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:background .2s;margin-top:1rem;display:inline-flex;align-items:center;gap:.5rem;}
+.btn-next:hover{background:#2d2010;}
+.btn-next:disabled{opacity:.4;cursor:default;}
+.btn-restart{background:none;border:1.5px solid var(--border);color:var(--muted);padding:.7rem 1.5rem;font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;transition:all .2s;margin-top:1rem;margin-left:.8rem;}
+.btn-restart:hover{border-color:var(--gold);color:var(--ink);}
+.btn-download{display:inline-flex;align-items:center;gap:.5rem;background:var(--gold);color:var(--ink);border:none;padding:.8rem 1.8rem;font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;transition:all .2s;font-weight:700;margin-top:1rem;}
+.btn-download:hover{background:var(--gold-light);}
+.btn-download svg{width:.9rem;height:.9rem;}
+
+/* RESULT */
+.result-card{border:2px solid var(--gold);background:var(--parchment);padding:1.8rem;position:relative;margin-bottom:1.2rem;}
+.result-card::before{content:'';position:absolute;top:6px;left:6px;right:-6px;bottom:-6px;border:1px solid var(--border);z-index:-1;}
+.rbadge{display:inline-block;background:var(--ink);color:var(--gold);font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;padding:.25rem .7rem;margin-bottom:.8rem;}
+.rtitle{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:900;color:var(--ink);margin-bottom:.35rem;line-height:1.2;}
+.rtagline{font-style:italic;color:var(--muted);font-size:.88rem;margin-bottom:1.2rem;border-left:3px solid var(--gold);padding-left:.9rem;line-height:1.6;}
+.result-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-top:1.2rem;}
+@media(max-width:700px){.result-grid{grid-template-columns:1fr;}}
+.rsec h4{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);}
+.rsec ul{list-style:none;padding:0;}
+.rsec ul li{font-size:.82rem;color:var(--ink);padding:.27rem 0 .27rem 1rem;border-bottom:1px dotted var(--border);position:relative;line-height:1.4;}
+.rsec ul li::before{content:'→';position:absolute;left:0;color:var(--gold);font-size:.72rem;}
+.tag-row{display:flex;flex-wrap:wrap;gap:.3rem;}
+.tag{background:#ede4d0;padding:.18rem .5rem;font-family:'DM Mono',monospace;font-size:.58rem;color:var(--muted);}
+.tag.ok{background:#e0ede0;color:var(--green);}
+.tag.danger{background:#f5e0de;color:var(--red);}
+
+/* TUTO PAGE */
+.tuto-wrap{max-width:760px;margin:0 auto;padding:2rem;}
+.tuto-intro{text-align:center;padding:1.5rem 0 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+.tuto-intro p{color:var(--muted);font-style:italic;font-size:.92rem;max-width:480px;margin:.4rem auto 0;line-height:1.8;}
+.tstep{display:flex;gap:1.5rem;margin-bottom:2.2rem;position:relative;}
+.tstep::before{content:'';position:absolute;left:1.9rem;top:3.8rem;bottom:-2.2rem;width:1px;background:var(--border);z-index:0;}
+.tstep:last-child::before{display:none;}
+.tcirc{flex-shrink:0;width:3.8rem;height:3.8rem;border:2px solid var(--gold);background:var(--parchment);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;z-index:1;}
+.tcirc .n{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--gold);line-height:1;}
+.tcirc .t{font-family:'DM Mono',monospace;font-size:.5rem;color:var(--muted);}
+.tcontent{flex:1;padding-top:.2rem;}
+.tcontent h3{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:.5rem;}
+.tcontent p{font-size:.86rem;color:#3d3020;line-height:1.8;margin-bottom:.6rem;}
+.checklist{list-style:none;background:var(--parchment);border-left:3px solid var(--gold);padding:.7rem .9rem;margin-top:.6rem;}
+.checklist li{font-size:.8rem;padding:.25rem 0;display:flex;gap:.5rem;align-items:flex-start;color:var(--ink);line-height:1.5;}
+.checklist li .ck{color:var(--gold);flex-shrink:0;}
+.tuto-footer{background:var(--ink);padding:1.8rem;text-align:center;margin-top:2.5rem;}
+.tuto-footer blockquote{font-family:'Playfair Display',serif;font-size:1rem;font-style:italic;color:var(--gold-light);max-width:480px;margin:0 auto;line-height:1.8;}
+.tuto-footer cite{display:block;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.15em;color:var(--muted);margin-top:.7rem;font-style:normal;text-transform:uppercase;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,18,8,.65);z-index:500;align-items:flex-start;justify-content:flex-end;}
+.modal-overlay.open{display:flex;}
+.modal-panel{background:var(--cream);width:420px;max-width:100%;height:100vh;overflow-y:auto;padding:2rem 1.8rem;position:relative;box-shadow:-4px 0 24px rgba(26,18,8,.3);animation:slideIn .25s ease;}
+@keyframes slideIn{from{transform:translateX(60px);opacity:0;}to{transform:none;opacity:1;}}
+.modal-close{position:absolute;top:1rem;right:1rem;background:none;border:1px solid var(--border);width:2rem;height:2rem;cursor:pointer;font-size:1rem;color:var(--muted);display:flex;align-items:center;justify-content:center;transition:all .2s;}
+.modal-close:hover{border-color:var(--gold);color:var(--ink);}
+.modal-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;color:var(--ink);margin-bottom:.3rem;padding-right:2.5rem;}
+.modal-badge{font-family:'DM Mono',monospace;font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;padding:.2rem .6rem;margin-bottom:1rem;display:inline-block;}
+.modal-badge.favorable{background:#e0ede0;color:var(--green);}
+.modal-badge.indecis{background:#ede4d0;color:var(--muted);}
+.modal-badge.defavorable{background:#f5e0de;color:var(--red);}
+.modal-badge.fort{background:#f0d0cc;color:var(--red);}
+.modal-badge.moyen{background:#ede4d0;color:var(--muted);}
+.modal-badge.faible{background:#d0e8d0;color:var(--green);}
+.modal-badge.gold{background:var(--gold);color:var(--ink);}
+.modal-section{margin-bottom:1.2rem;}
+.modal-section h4{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;padding-bottom:.3rem;border-bottom:1px solid var(--border);}
+.modal-section p,.modal-section li{font-size:.95rem;line-height:1.7;color:var(--ink);}
+.modal-section ul{padding-left:1rem;}
+.modal-section li{margin:.2rem 0;}
+
+/* Sidebar clickable */
+.sb-item{font-size:1rem;color:#c8b898;padding:.4rem 0;border-bottom:1px solid #2a2010;line-height:1.5;cursor:pointer;transition:color .2s;}
+.sb-item:hover{color:var(--gold-light);}
+.sb-title{font-family:'DM Mono',monospace;font-size:.72rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;}
+.sb-empty{font-family:'DM Mono',monospace;font-size:.75rem;color:#4a3f30;font-style:italic;}
+.sb-item .sb-label{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;display:block;}
+
+@media(max-width:900px){
+  .sidebar{display:none;}
+  .arg-two-col{grid-template-columns:1fr;}
+  .target-form-row{grid-template-columns:1fr;}
+  .choices.cols2{grid-template-columns:1fr;}
+}
+@media(max-width:600px){.main{padding:1rem;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Ars Rhetorica</div>
+  <button class="active" onclick="showPage('tree',this)">⟁ Préparateur</button>
+  <button onclick="showPage('tuto',this)">⊞ Guide Méthode</button>
+</nav>
+
+<!-- ============================================================
+     PAGE PRÉPARATEUR
+============================================================ -->
+<div id="page-tree" class="page active">
+  <div class="hero">
+    <h1>Construire votre <em>argumentaire</em></h1>
+    <p class="sub">Analyse · Cibles · Arguments · Tactique · Rôle · Leviers · Thèse</p>
+  </div>
+  <div class="mode-bar">
+    <span class="mode-label">Mode :</span>
+    <div class="mode-toggle">
+      <button class="active" id="btn-simple" onclick="setMode('simple')">Simplifié</button>
+      <button id="btn-advanced" onclick="setMode('advanced')">Avancé</button>
+    </div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-section" id="sb-debate">
+        <div class="sb-title">Débat</div>
+        <div class="sb-empty" id="sb-debate-val">—</div>
+      </div>
+      <div class="sidebar-section" id="sb-subject" style="display:none">
+        <div class="sb-title">Centre du sujet</div>
+        <div id="sb-subject-val"></div>
+      </div>
+      <div class="sidebar-section" id="sb-context" style="display:none">
+        <div class="sb-title">Contexte</div>
+        <div id="sb-context-val"></div>
+      </div>
+      <div class="sidebar-section" id="sb-targets-sec" style="display:none">
+        <div class="sb-title">Cibles</div>
+        <div id="sb-targets-val"></div>
+      </div>
+      <div class="sidebar-section" id="sb-args-sec" style="display:none">
+        <div class="sb-title">Mes arguments</div>
+        <div id="sb-myargs-val"></div>
+        <div class="sb-title" style="margin-top:.6rem">Arguments adverses</div>
+        <div id="sb-advargs-val"></div>
+      </div>
+      <div class="sidebar-section" id="sb-tactic-sec" style="display:none">
+        <div class="sb-title">Tactique</div>
+        <div class="sb-item" id="sb-tactic-val"></div>
+      </div>
+      <div class="sidebar-section" id="sb-role-sec" style="display:none">
+        <div class="sb-title">Rôle(s)</div>
+        <div id="sb-role-val"></div>
+      </div>
+      <div class="sidebar-section" id="sb-leviers-sec" style="display:none">
+        <div class="sb-title">Leviers</div>
+        <div id="sb-leviers-val"></div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="main">
+      <div class="breadcrumb" id="breadcrumb"></div>
+
+      <!-- ====== STEP 1 : ANALYSE SUJET ====== -->
+      <div class="step active" id="s1">
+        <div class="step-header">
+          <div class="step-meta"><span class="step-num" id="s1-num">Étape 1</span></div>
+          <div class="step-question">Type & analyse du sujet</div>
+          <div class="step-hint">Le type dépend de la <em>formulation</em> du sujet, pas du sujet lui-même.</div>
+        </div>
+
+        <div class="field-group">
+          <label class="flabel">Type de débat</label>
+          <div class="choices">
+            <button class="choice-btn" onclick="selectDebateType('Délibératif',this)">
+              <span class="clabel">Délibératif</span>
+              Pour/contre — convaincre de prendre une décision.
+              <span class="cdesc">Ex : "Faut-il boycotter la Coupe du monde ?"</span>
+            </button>
+            <button class="choice-btn" onclick="selectDebateType('Judiciaire',this)">
+              <span class="clabel">Judiciaire</span>
+              Juger de l'innocence ou culpabilité d'une entité.
+              <span class="cdesc">Ex : "Faut-il condamner la FIFA ?"</span>
+            </button>
+            <button class="choice-btn" onclick="selectDebateType('Épidictique',this)">
+              <span class="clabel">Épidictique</span>
+              Porter un jugement — sans question directe.
+              <span class="cdesc">Ex : "Les spectateurs, complices du drame."</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Advanced only -->
+        <div class="adv-only" style="display:none">
+          <div class="field-group">
+            <label class="flabel">Centre de gravité du débat</label>
+            <p style="font-size:.78rem;color:var(--muted);font-style:italic;margin-bottom:.4rem;line-height:1.5;">Quelle est la vraie question derrière la question posée ?</p>
+            <textarea id="subject-centre" placeholder="Ex : Le sujet porte sur la responsabilité morale des consommateurs, pas seulement sur les règles sportives…" oninput="updateSidebar()"></textarea>
+          </div>
+          <div class="field-group">
+            <label class="flabel">Contexte de l'argumentaire</label>
+            <p style="font-size:.78rem;color:var(--muted);font-style:italic;margin-bottom:.4rem;line-height:1.5;">Ce qui a relancé la controverse, les faits récents, le cadre.</p>
+            <textarea id="subject-context" placeholder="Ex : Débat lancé suite à la décision du gouvernement de X. Contexte de crise économique…" oninput="updateSidebar()"></textarea>
+          </div>
+          <button class="btn-next" onclick="goTo('s2','Analyse sujet')">Étape suivante →</button>
+        </div>
+        <div class="simple-only">
+          <div class="warn"><strong>⚠ Avant de continuer</strong>Avez-vous la certitude absolue du centre de gravité du sujet ? En cas de doute, demandez des précisions.</div>
+        </div>
+      </div>
+
+      <!-- ====== STEP 2 : CIBLES ====== -->
+      <div class="step" id="s2">
+        <div class="step-header">
+          <div class="step-meta"><span class="step-num" id="s2-num">Étape 2</span></div>
+          <div class="step-question">Identifier les cibles</div>
+          <div class="step-hint">L'adversaire n'est PAS une cible. Visez : favorable, indécis (prioritaire), défavorable.</div>
+        </div>
+
+        <!-- Simple -->
+        <div class="simple-only">
+          <div class="choices cols2">
+            <button class="choice-btn" onclick="goTo('s3','Public favorable',this)"><span class="clabel">Favorable</span>Acquis, mais non hermétique aux arguments adverses.</button>
+            <button class="choice-btn" onclick="goTo('s3','Public indécis',this)"><span class="clabel">Indécis (prioritaire)</span>Concerné, sans avis — c'est ici que tout se joue.</button>
+            <button class="choice-btn" onclick="goTo('s3','Public défavorable',this)"><span class="clabel">Défavorable</span>Contre vous, mais perméable si l'angle est bon.</button>
+            <button class="choice-btn" onclick="goTo('s3','Public mixte',this)"><span class="clabel">Mixte</span>Plusieurs profils simultanément.</button>
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <div class="adv-only" style="display:none">
+          <div class="target-type-row">
+            <button class="ttype-btn" id="tbtn-favorable" onclick="selectTargetType('favorable')">🟢 Favorable</button>
+            <button class="ttype-btn" id="tbtn-indecis" onclick="selectTargetType('indecis')">🟡 Indécis</button>
+            <button class="ttype-btn" id="tbtn-defavorable" onclick="selectTargetType('defavorable')">🔴 Défavorable</button>
+          </div>
+          <div class="target-form" id="target-form">
+            <div class="target-form-row">
+              <div><label class="flabel">Nom / label</label><input type="text" id="tname" placeholder="Ex : Agriculteurs du Sud…"></div>
+              <div><label class="flabel">Profil</label><input type="text" id="tprofil" placeholder="Ex : 45 ans, indépendant…"></div>
+            </div>
+            <label class="flabel">Ce qu'ils pensent / ce qui les motive</label>
+            <textarea id="tcomment" placeholder="Ex : Veulent plus de liberté. Méfiants envers les règlementations…" style="min-height:55px;"></textarea>
+            <button class="btn-add" style="margin-top:.6rem" onclick="addTarget()">+ Ajouter</button>
+          </div>
+          <div class="target-list" id="target-list"><div class="arg-empty">Ajoutez au moins une cible.</div></div>
+          <button class="btn-next" style="margin-top:.8rem" onclick="advFromTargets()">Étape suivante →</button>
+        </div>
+      </div>
+
+      <!-- ====== STEP 3a : MES ARGUMENTS ====== -->
+      <div class="step" id="s3">
+        <div class="step-header">
+          <div class="step-meta"><span class="step-num" id="s3-num">Étape 3</span></div>
+          <div class="step-question">Mes arguments</div>
+          <div class="step-hint">Listez et classez vos propres arguments honnêtement.</div>
+        </div>
+
+        <!-- Simple -->
+        <div class="simple-only">
+          <div class="choices cols2">
+            <button class="choice-btn" onclick="goTo('s4','Attaquant',this)"><span class="clabel">Attaquant</span>Vos arguments sont solides — vous comptez les imposer.</button>
+            <button class="choice-btn" onclick="goTo('s4','Assiégeant',this)"><span class="clabel">Assiégeant</span>Les failles adverses sont évidentes — vous les exploitez.</button>
+            <button class="choice-btn" onclick="goTo('s4','Combiné',this)"><span class="clabel">Combiné</span>Vous développez vos forces ET exploitez les failles adverses.</button>
+            <button class="choice-btn" onclick="goTo('s4','Défenseur',this)"><span class="clabel">Défenseur</span>Position difficile — vous devez inverser la tendance.</button>
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <div class="adv-only" style="display:none">
+          <!-- Visu cibles -->
+          <div id="s3-targets-visu" class="panel" style="margin-bottom:1.2rem;display:none">
+            <h4>Rappel — vos cibles</h4>
+            <div id="s3-targets-content"></div>
+          </div>
+          <div class="panel">
+            <h4>Mes arguments</h4>
+            <div class="arg-input-row">
+              <input type="text" id="myArgIn" placeholder="Un argument…" onkeydown="if(event.key==='Enter')addArg('my')">
+              <select id="myArgStr"><option value="fort">Fort</option><option value="moyen" selected>Moyen</option><option value="faible">Faible</option></select>
+              <button class="btn-add" onclick="addArg('my')">+</button>
+            </div>
+            <div class="arg-list" id="myArgList"><div class="arg-empty">Aucun argument</div></div>
+          </div>
+          <div class="warn"><strong>Règle d'or</strong>Ne jamais utiliser les arguments faibles. 2 arguments forts > 6 arguments mélangés.</div>
+          <button class="btn-next" onclick="goTo('s3b','Mes arguments saisis',null)">Étape suivante — Arguments adverses →</button>
+        </div>
+      </div>
+
+      <!-- ====== STEP 3b : ARGUMENTS ADVERSES ====== -->
+      <div class="step" id="s3b">
+        <div class="step-header">
+          <div class="step-meta"><span class="step-num">Étape 3b</span></div>
+          <div class="step-question">Arguments adverses</div>
+          <div class="step-hint">Listez et classez les arguments de votre adversaire. Soyez honnête sur leur force.</div>
+        </div>
+        <div class="adv-only" style="display:block">
+          <!-- Visu mes args -->
+          <div class="panel" style="margin-bottom:1.2rem">
+            <h4>Rappel — mes arguments</h4>
+            <div id="s3b-myargs-content"></div>
+          </div>
+          <div class="panel">
+            <h4>Arguments adverses</h4>
+            <div class="arg-input-row">
+              <input type="text" id="advArgIn" placeholder="Argument adverse…" onkeydown="if(event.key==='Enter')addArg('adv')">
+              <select id="advArgStr"><option value="fort">Fort</option><option value="moyen" selected>Moyen</option><option value="faible">Faible</option></select>
+              <button class="btn-add" onclick="addArg('adv')">+</button>
+            </div>
+            <div class="arg-list" id="advArgList"><div class="arg-empty">Aucun argument adverse</div></div>
+          </div>
+          <div class="warn"><strong>Préparez-vous</strong>Listez tous les arguments adverses, y compris les forts. Mieux vaut les connaître maintenant que les subir en débat.</div>
+          <button class="btn-next" onclick="advFromArgs()">Étape suivante →</button>
+        </div>
+      </div>
+
+      <!-- ====== STEP 4 : TACTIQUE ====== -->
+      <div class="step" id="s4">
+        <div class="step-header">
+          <div class="step-meta"><span class="step-num" id="s4-num">Étape 4</span></div>
+          <div class="step-question">Choisir la tactique</div>
+          <div class="step-hint">Votre posture de combat.</div>
+        </div>
+
+        <!-- Simple -->
+        <div class="simple-only">
+          <div class="choices cols2">
+            <button class="choice-btn" onclick="goTo('s5','Forteresse',this)"><span class="clabel">Forteresse</span>Jouer uniquement vos arguments les plus solides.<span class="cdesc">Position difficile à prendre.</span></button>
+            <button class="choice-btn" onclick="goTo('s5','Siège',this)"><span class="clabel">Siège</span>Attaquer exclusivement les failles adverses.<span class="cdesc">L'adversaire défend, pas vous.</span></button>
+            <button class="choice-btn" onclick="goTo('s5','Judo',this)"><span class="clabel">Judo (failles → forces)</span>Longtemps sur les failles adverses, 2 phrases dévastatrices sur vos forces.<span class="cdesc">Prend l'adversaire au dépourvu.</span></button>
+            <button class="choice-btn" onclick="goTo('s5','Contrepied',this)"><span class="clabel">Contrepied (forces → failles)</span>Longtemps sur vos forces, 2 phrases sur les failles adverses.<span class="cdesc">Déplace le centre de gravité en fin.</span></button>
+            <button class="choice-btn" onclick="goTo('s5','Piège',this)"><span class="clabel">Piège</span>Neutraliser l'argument fort adverse avant qu'il soit posé.<span class="cdesc">Double tranchant.</span></button>
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <div class="adv-only" style="display:none">
+          <!-- Visu args -->
+          <div id="s4-args-visu" class="panel" style="margin-bottom:1rem;display:none">
+            <h4>Rappel — arguments des deux côtés</h4>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;" id="s4-args-content"></div>
+          </div>
+          <div class="tactic-grid" id="tacticGrid">
+            <div class="tactic-card" onclick="selectTactic(this,'Forteresse')"><h5>Forteresse</h5><p>Jouer uniquement vos arguments forts. Ignorer les faibles.</p><span class="teffect">✦ Position difficile à prendre</span><span class="trisk">⚠ Peut sembler incomplet</span></div>
+            <div class="tactic-card" onclick="selectTactic(this,'Siège')"><h5>Siège</h5><p>Attaquer exclusivement les failles adverses.</p><span class="teffect">✦ Adversaire en posture défensive</span><span class="trisk">⚠ Donne l'impression de manquer de thèse</span></div>
+            <div class="tactic-card" onclick="selectTactic(this,'Judo')"><h5>Judo (failles → forces)</h5><p>Longtemps sur les failles adverses, puis 2 phrases sur vos forces.</p><span class="teffect">✦ Déplace le centre de gravité</span><span class="trisk">⚠ Les 2 phrases finales doivent être parfaites</span></div>
+            <div class="tactic-card" onclick="selectTactic(this,'Contrepied')"><h5>Contrepied (forces → failles)</h5><p>Longtemps sur vos forces, puis 2 phrases sur les failles adverses.</p><span class="teffect">✦ Surprise finale</span><span class="trisk">⚠ Adversaire peut ignorer la fin</span></div>
+            <div class="tactic-card" onclick="selectTactic(this,'Piège')"><h5>Piège</h5><p>Neutraliser l'argument fort adverse avant qu'il soit posé.</p><span class="teffect">✦ Victoire décisive si réussi</span><span class="trisk">⚠ Catastrophique si raté</span></div>
+          </div>
+          <button class="btn-next" id="btnNextTactic" onclick="advFromTactic()" disabled>Étape suivante →</button>
+        </div>
+      </div>
+
+      <!-- ====== STEP 5 : RÔLE(S) ====== -->
+      <div class="step" id="s5">
+        <div class="step-header">
+          <div class="step-meta"><span class="step-num" id="s5-num">Étape 5</span></div>
+          <div class="step-question">Incarner un rôle</div>
+          <div class="step-hint">Le rôle doit <em>porter</em> le contenu de votre thèse.</div>
+        </div>
+
+        <!-- Simple -->
+        <div class="simple-only">
+          <div class="choices">
+            <button class="choice-btn" onclick="goTo('s6','La Rigueur',this)"><span class="clabel">La Rigueur</span>Maîtrise technique, chiffres, procédures.</button>
+            <button class="choice-btn" onclick="goTo('s6','Le Défi & la Colère',this)"><span class="clabel">Le Défi & la Colère</span>Scandale, injustice, ennemi désigné.</button>
+            <button class="choice-btn" onclick="goTo('s6','La Bienveillance',this)"><span class="clabel">La Bienveillance</span>Synthèse, ouverture, bras tendus.</button>
+            <button class="choice-btn" onclick="goTo('s6','L\'Humour Moqueur',this)"><span class="clabel">L'Humour Moqueur</span>Punchlines assassines (à doser).</button>
+            <button class="choice-btn" onclick="goTo('s6','La Vertu & les Valeurs',this)"><span class="clabel">La Vertu & les Valeurs</span>Gardien des principes. Calme, hauteur.</button>
+            <button class="choice-btn" onclick="goTo('s6','L\'Empathie',this)"><span class="clabel">L'Empathie</span>Récit humain en 5 temps.</button>
+            <button class="choice-btn" onclick="goTo('s6','Lyrisme & Triomphe',this)"><span class="clabel">Lyrisme & Triomphe</span>Épopée. L'adversaire n'existe plus.</button>
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <div class="adv-only" style="display:none">
+          <!-- Visu cibles + tactique + args -->
+          <div id="s5-visu" class="panel" style="margin-bottom:1rem;display:none">
+            <h4>Rappel — cibles · tactique · arguments</h4>
+            <div id="s5-visu-content"></div>
+          </div>
+          <p class="role-hint">Cliquez une fois pour le rôle <strong>principal</strong>, une deuxième fois pour ajouter un rôle <strong>secondaire</strong>. Cliquez à nouveau pour désélectionner.</p>
+          <div class="role-grid" id="roleGrid">
+            <!-- populated by JS -->
+          </div>
+          <button class="btn-next" id="btnNextRole" onclick="advFromRole()" disabled>Étape suivante →</button>
+        </div>
+      </div>
+
+      <!-- ====== STEP 6 : LEVIERS ====== -->
+      <div class="step" id="s6">
+        <div class="step-header">
+          <div class="step-meta"><span class="step-num" id="s6-num">Étape 6</span></div>
+          <div class="step-question">Leviers rhétoriques</div>
+          <div class="step-hint">Sélectionnez vos leviers et associez-les à un argument. Les artifices de réplique sont inclus.</div>
+        </div>
+
+        <!-- Simple -->
+        <div class="simple-only">
+          <button class="choice-btn" style="width:100%;text-align:center" onclick="goTo('s7','Leviers notés',null)">
+            <span class="clabel">Passer à la construction de la thèse →</span>
+            En mode simplifié, consultez le guide méthode pour les leviers.
+          </button>
+        </div>
+
+        <!-- Advanced -->
+        <div class="adv-only" style="display:none">
+          <div id="s6-reco" class="info-box" style="display:none"><strong>★ Recommandés pour votre rôle</strong><span id="s6-reco-text"></span></div>
+          <div class="levier-list" id="levierList"><!-- populated by JS --></div>
+          <button class="btn-next" onclick="advFromLeviers()">Étape suivante →</button>
+        </div>
+      </div>
+
+      <!-- ====== STEP 7counter : RÉPONDRE AUX ARGUMENTS ADVERSES ====== -->
+      <div class="step" id="s7counter">
+        <div class="step-header">
+          <div class="step-meta"><span class="step-num">Étape 8 / 9</span><span style="font-family:'DM Mono',monospace;font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .5rem;border:1px solid var(--gold);color:var(--gold);margin-left:.5rem;">Avancé</span></div>
+          <div class="step-question">Répondre aux arguments adverses</div>
+          <div class="step-hint">Pour chaque argument adverse, choisissez une stratégie et préparez votre contre-réplique.</div>
+        </div>
+        <div class="adv-only" style="display:block">
+          <div class="info-box"><strong>Méthode en 4 temps</strong>1. Anticiper · 2. Écouter et choisir sur quoi répliquer · 3. Résumer les propos adverses en les retournant à votre avantage · 4. Neutraliser avec votre contre-argument préparé.</div>
+          <div id="counter-list" style="margin-top:1rem;"><!-- populated by JS --></div>
+          <div class="warn" style="margin-top:1rem"><strong>Artifices si répliquer est impossible</strong>Par le haut (attaquer le rôle) · Par l'arrière (dévoiler le levier) · Par le côté (argument non utilisé) · Par le dessous (coup bas — Schopenhauer, une seule fois)</div>
+          <button class="btn-next" onclick="goTo('s7','Contre-répliques préparées',null)">Étape suivante — Construction de la thèse →</button>
+        </div>
+      </div>
+
+      <!-- ====== STEP 7 : THÈSE ====== -->
+      <div class="step" id="s7">
+        <div class="step-header">
+          <div class="step-meta"><span class="step-num" id="s7-num">Étape 9 / 9</span></div>
+          <div class="step-question">Construction de la thèse</div>
+          <div class="step-hint">Tout est réuni. Construisez votre discours en 3 parties.</div>
+        </div>
+
+        <!-- Simple -->
+        <div class="simple-only">
+          <div class="choices cols2">
+            <button class="choice-btn" onclick="goTo('result','Prêt',this)"><span class="clabel">Voir le récapitulatif →</span>Votre argumentaire est construit.</button>
+          </div>
+        </div>
+
+        <!-- Advanced -->
+        <div class="adv-only" style="display:none">
+          <!-- Context recap -->
+          <div id="s7-context-visu" class="panel" style="margin-bottom:1.5rem;display:none">
+            <h4>Contexte · Rôle · Arguments + Leviers</h4>
+            <div id="s7-context-content"></div>
+          </div>
+
+          <div class="thesis-part">
+            <h4><span class="tnum">1</span>Accroche</h4>
+            <p class="tips">Anecdote, paradoxe, chiffre fort ou référence à la thèse adverse. Évitez les citations génériques. Aucun doute possible sur le camp défendu.</p>
+            <textarea id="thesis-accroche" placeholder="Mon accroche…"></textarea>
+          </div>
+          <div class="thesis-part">
+            <h4><span class="tnum">2</span>Développement</h4>
+            <p class="tips">Tactique + arguments forts + leviers. Zéro ambiguïté. Une formule marquante, forte, répétable. La fin doit avoir fait basculer les indécis.</p>
+            <textarea id="thesis-dev" placeholder="Développement de ma thèse…" style="min-height:120px;"></textarea>
+          </div>
+          <div class="thesis-part">
+            <h4><span class="tnum">3</span>Conclusion</h4>
+            <p class="tips">L'objectif est atteint. Le public comprend que c'est la fin et apprécie la prestation. Peut reprendre la formule marquante.</p>
+            <textarea id="thesis-conclu" placeholder="Ma conclusion…"></textarea>
+          </div>
+
+          <button class="btn-next" onclick="goTo('result','Thèse rédigée',null)">Voir le récapitulatif →</button>
+        </div>
+      </div>
+
+      <!-- ====== RESULT ====== -->
+      <div class="step" id="result">
+        <div class="result-card" id="resultCard"></div>
+        <button class="btn-download" onclick="downloadFiche()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Télécharger ma fiche
+        </button>
+        <button class="btn-restart" onclick="restart()">↺ Recommencer</button>
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /layout -->
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+    <div class="modal-panel" id="modalPanel">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+</div><!-- /page-tree -->
+
+<!-- ============================================================
+     PAGE GUIDE MÉTHODE
+============================================================ -->
+<div id="page-tuto" class="page">
+  <div class="hero"><h1>Guide de <em>préparation</em></h1><p class="sub">Méthode · De la stratégie à la réplique</p></div>
+  <div class="tuto-wrap">
+    <div class="tuto-intro"><p>Un pitch n'est pas une discussion. C'est une guerre. On se bat comme un état-major — pas de place au talent, seulement à la stratégie.</p></div>
+
+    <div class="tstep">
+      <div class="tcirc"><span class="n">1</span><span class="t">15 min</span></div>
+      <div class="tcontent">
+        <h3>Analyser l'objet et la forme du débat</h3>
+        <p>Identifiez le <strong>type de débat</strong> (délibératif / judiciaire / épidictique) selon la formulation, pas le sujet. Définissez le <strong>centre de gravité</strong> : que sous-entend vraiment le sujet ?</p>
+        <ul class="checklist">
+          <li><span class="ck">◆</span>Identifier le type de débat</li>
+          <li><span class="ck">◆</span>Analyser les attendus implicites — en cas de doute : demander des précisions</li>
+          <li><span class="ck">◆</span>Clarifier les modalités : timing, ordre, critères de jugement</li>
+        </ul>
+        <div class="warn"><strong>⚠ Erreur classique</strong>"Le travail des enfants, une bonne chose ?" peut être une apologie ou un plaidoyer humaniste — le contexte change tout.</div>
+      </div>
+    </div>
+
+    <div class="tstep">
+      <div class="tcirc"><span class="n">2</span><span class="t">15 min</span></div>
+      <div class="tcontent">
+        <h3>Identifier et analyser ses cibles</h3>
+        <p>L'adversaire n'est <strong>pas</strong> une cible. Vos trois cibles : favorable (consolider), indécis (prioritaire), défavorable (perméable).</p>
+        <ul class="checklist">
+          <li><span class="ck">◆</span>Établir le contexte historique de la controverse</li>
+          <li><span class="ck">◆</span>Analyser les acteurs : qui sont-ils, à quoi sont-ils sensibles ?</li>
+          <li><span class="ck">◆</span>Sources : presse, philosophes, réseaux sociaux</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tstep">
+      <div class="tcirc"><span class="n">3</span><span class="t">3 h</span></div>
+      <div class="tcontent">
+        <h3>Évaluer l'argumentaire & choisir la tactique</h3>
+        <p>Listez <strong>tous</strong> les arguments des deux côtés. Triez par poids. Éliminez les faibles. Choisissez une tactique.</p>
+        <ul class="checklist">
+          <li><span class="ck">◆</span>Mindmap : vos arguments + ceux de l'adversaire</li>
+          <li><span class="ck">◆</span>Trier : fort / moyen / faible — éliminer les faibles sans pitié</li>
+          <li><span class="ck">◆</span>Tactiques : Forteresse · Siège · Judo · Contrepied · Piège</li>
+        </ul>
+        <div class="warn"><strong>Règle d'or</strong>2 arguments forts > 6 mélangés. Un argument faible donne prise à l'adversaire.</div>
+      </div>
+    </div>
+
+    <div class="tstep">
+      <div class="tcirc"><span class="n">4</span><span class="t">30 min</span></div>
+      <div class="tcontent">
+        <h3>Choisir le ou les rôles à incarner</h3>
+        <p>Le rôle doit <strong>porter</strong> le contenu. On ne dénonce pas un scandale calmement. Possible d'avoir un rôle principal et un secondaire.</p>
+        <ul class="checklist">
+          <li><span class="ck">◆</span>Rigueur — technique, chiffres, gestuelle géométrique</li>
+          <li><span class="ck">◆</span>Défi & Colère — scandale, adversaire désigné, gestes saccadés</li>
+          <li><span class="ck">◆</span>Bienveillance — synthèse, bras tendus, citer l'adversaire</li>
+          <li><span class="ck">◆</span>Humour moqueur — punchlines (ponctuel uniquement)</li>
+          <li><span class="ck">◆</span>Vertu & Valeurs — calme, voix grave, peu de gestes</li>
+          <li><span class="ck">◆</span>Empathie — récit vérifiable en 5 temps, ton bas</li>
+          <li><span class="ck">◆</span>Lyrisme & Triomphe — épopée, adversaire inexistant, tout au fond</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="tstep">
+      <div class="tcirc"><span class="n">5</span><span class="t">1 h</span></div>
+      <div class="tcontent">
+        <h3>Choisir les leviers rhétoriques & les associer aux arguments</h3>
+        <p>Chaque levier se lie à un argument précis. Plusieurs leviers peuvent servir le même argument.</p>
+        <ul class="checklist">
+          <li><span class="ck">◆</span>Juste milieu · Cas choisi · Alternative · Malaise adversarial</li>
+          <li><span class="ck">◆</span>Ennemi commun · Autorité · Enquête publique · Interrogatoire</li>
+          <li><span class="ck">◆</span>Histoire · Avenir · Victimaire · Scandale · Étranger</li>
+          <li><span class="ck">◆</span>Réalité / Principes · Données · Mots · Répétition · Contradiction</li>
+          <li><span class="ck">◆</span>Analogie · Coup de théâtre · Assumer avec conditions · Vérité</li>
+        </ul>
+        <div class="sdiv"><span>Artifices de réplique</span></div>
+        <p>Si répliquer directement est contre-productif ou impossible :</p>
+        <ul class="checklist">
+          <li><span class="ck">◆</span><strong>Par le haut</strong> — attaquer le rôle incarné par l'adversaire, pas ses arguments</li>
+          <li><span class="ck">◆</span><strong>Par l'arrière</strong> — dévoiler le levier rhétorique utilisé, montrer les coulisses</li>
+          <li><span class="ck">◆</span><strong>Par le côté</strong> — attaquer sur un argument qu'il n'a pas utilisé mais aurait dû</li>
+          <li><span class="ck">◆</span><strong>Par le dessous</strong> — coup bas sans s'exposer (Schopenhauer) — une seule fois, terrain non préparé</li>
+        </ul>
+        <div class="warn"><strong>⚠ Attention</strong>Si l'adversaire connaît votre artifice, il peut vous retourner la situation et vous faire passer pour un manipulateur.</div>
+      </div>
+    </div>
+
+    <div class="tstep">
+      <div class="tcirc"><span class="n">6</span><span class="t">30 min</span></div>
+      <div class="tcontent">
+        <h3>Construire la thèse</h3>
+        <p>Trois parties. Le public ne voit pas le plan, mais le sent. La fin du développement doit avoir fait basculer les indécis.</p>
+        <ul class="checklist">
+          <li><span class="ck">◆</span><strong>Accroche</strong> — anecdote, paradoxe, chiffre ou référence adverse</li>
+          <li><span class="ck">◆</span><strong>Développement</strong> — tactique + arguments forts + leviers. Une formule marquante, forte, répétable</li>
+          <li><span class="ck">◆</span><strong>Conclusion</strong> — l'objectif est atteint, le public comprend et apprécie</li>
+        </ul>
+        <div class="warn"><strong>Pour un oral</strong>Ne jamais rédiger le texte en entier. Cela sonne faux. Mots-clés + entraînement oral.</div>
+      </div>
+    </div>
+
+    <div class="sdiv" style="margin:2rem 0 1.5rem"><span>Erreurs à ne jamais commettre</span></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:.8rem;margin-bottom:2rem;">
+      <div style="background:var(--parchment);border-left:3px solid var(--red);padding:.9rem 1rem;"><div style="font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;">Prise de parole</div><p style="font-size:.8rem;line-height:1.7;">Votre corps parle avant vos mots. Silence + micro-rituel. Pas de "Bonjour", "Alors", "Bien", "Du coup".</p></div>
+      <div style="background:var(--parchment);border-left:3px solid var(--red);padding:.9rem 1rem;"><div style="font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;">Formules interdites</div><p style="font-size:.8rem;line-height:1.7;">"Pour en revenir au sujet" · "Comme je l'ai dit" · "Selon moi" · "C'est tout" · "Pardon, je m'excuse"</p></div>
+      <div style="background:var(--parchment);border-left:3px solid var(--red);padding:.9rem 1rem;"><div style="font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:.4rem;">Cafouillage</div><p style="font-size:.8rem;line-height:1.7;">Le public se fiche des coulisses. Silence et on repart. L'excuse expose la faiblesse.</p></div>
+    </div>
+    <div class="tuto-footer">
+      <blockquote>Sur quelle colline êtes-vous prêt à mourir ?<br>Et que diriez-vous pour convaincre les autres de faire de même ?</blockquote>
+      <cite>— La question fondamentale de toute prise de parole</cite>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+const ROLES = [
+  { key:'La Rigueur', tagline:'Maîtrise technique absolue. Précision, chiffres, procédures.', desc:'Idéal si votre tactique s\'appuie sur des faits incontestables.', tactics:['Forteresse','Données objectives','Leçon de l\'histoire','Enquête avec le public','Référence d\'autorité'], attitude:['Registre précis, technique, chiffré','Chrono visible, dossier, notes','Gestuelle géométrique','Voix posée, rythme régulier'], risques:['Trop froid → perd l\'indécis','Données contestables','Autorité qui a changé d\'avis'], leviers:['Données objectives','Référence d\'autorité','Leçon de l\'histoire','Enquête avec le public','Déjouer le sens des mots'] },
+  { key:'Le Défi & la Colère', tagline:'Scandale, injustice, ennemi désigné. Énergie communicative.', desc:'Idéal pour attaquer un adversaire ou lancer une dénonciation.', tactics:['Siège','Anaphore / martèlement','Interrogatoire','Ennemi commun','Dénoncer un scandale'], attitude:['Accélérer le rythme','Répétitions en début de phrase','Gestes amples et saccadés','Pointer du doigt'], risques:['Lasse si trop long','Radicalise l\'adversaire','Peut effrayer les indécis'], leviers:['Ennemi commun','Malaise adversarial','Répétition/anaphore','Contradiction adverse','Dénoncer un scandale','Interrogatoire'] },
+  { key:'La Bienveillance', tagline:'Embrasser les thèses pour en faire sa synthèse.', desc:'Idéal face à un public mixte ou défavorable.', tactics:['Juste milieu','Unir les adversaires','Assumer avec conditions','Enquête avec le public'], attitude:['Sourire, décontracté','Se déplacer vers l\'adversaire','Silences, regarder tout le public','Bras tendus, mains ouvertes'], risques:['Manipulation pointée','Perçu comme mou'], leviers:['Juste milieu','Unir les adversaires','Recourir à l\'étranger','Refuser les leviers','Autorité'] },
+  { key:'L\'Humour Moqueur', tagline:'Ridiculiser l\'adversaire. Punchlines assassines.', desc:'À utiliser ponctuellement, pas en continu.', tactics:['Punchlines préparées','Analogies dévalorisantes','Associer à une erreur connue','Distendre l\'argumentaire'], attitude:['Vocabulaire du ridicule et de la méchanceté','Ponctuer de rappels dévalorisants','Mimer ce qu\'on décrit'], risques:['Antipathie si trop poussé','Adversaire joue la victime'], leviers:['Malaise adversarial','Distendre l\'argumentaire','Analogie','Coup de théâtre'] },
+  { key:'La Vertu & les Valeurs', tagline:'Gardien du temple. Calme, hauteur, sens de l\'histoire.', desc:'Idéal pour rappeler les principes fondamentaux.', tactics:['Forteresse','Principes fondamentaux','Référence d\'autorité','Leçon de l\'histoire','Ennemi commun'], attitude:['Calme absolu, voix grave','Peu de gestes','Pile de livres cités','Phrases courtes comme un testament'], risques:['Perçu comme élitiste','Chaque principe a ses limites','Attaque "bien-pensant"'], leviers:['Principes fondamentaux','Autorité irréprochable','Ennemi commun','Leçon historique'] },
+  { key:'L\'Empathie', tagline:'Histoire vraie en 5 temps. Toucher par le réel.', desc:'Puissant si l\'histoire est irréprochable et vérifiable.', tactics:['Position victimaire','Réalité concrète','Failles adverses → forces','Projeter dans l\'avenir'], attitude:['Histoire vraie, non déguisée','Vocabulaire des émotions','Baisser le ton, ralentir','5 temps du récit empathique'], risques:['Histoire non vérifiable = fatal','Lassitude si répété','Celui qui n\'émeut pas… fait rire'], leviers:['Position victimaire','Réalité concrète','Projection dans l\'avenir','Analogie'] },
+  { key:'Lyrisme & Triomphe', tagline:'Épopée. L\'adversaire n\'existe plus.', desc:'Parfait pour ouvrir ou clore un discours.', tactics:['Forces → failles (2 phrases)','Anaphore','Projeter dans l\'avenir','Analogie puissante'], attitude:['Oublier l\'adversaire','Gestes amples, changements de rythme','Y aller à fond','Figures de style : superlatifs, antithèses'], risques:['Analogie retournée','Faux pas = catastrophe','Ne pas en abuser'], leviers:['Répétition/anaphore','Projection dans l\'avenir','Analogie','Alternative','Ennemi commun'] }
+];
+
+const LEVIERS = [
+  { name:'Incarner le juste milieu', desc:'Décrire 2 extrêmes et montrer que seule votre thèse est raisonnable.', risk:2 },
+  { name:'Réduire à un cas choisi', desc:'Amener la controverse sur un terrain difficile pour l\'adversaire.', risk:2 },
+  { name:'Enfermer dans une alternative', desc:'Développer deux thèses jusqu\'à deux options — le public choisit la vôtre.', risk:2 },
+  { name:'Créer un malaise adversarial', desc:'Disqualifier l\'adversaire en l\'associant à un personnage/idéologie haï.', risk:3 },
+  { name:'Lutter contre un ennemi commun', desc:'Introduire une personnalité dont l\'adversaire aurait intérêt à vous voir perdre.', risk:1 },
+  { name:'Se référer à une autorité', desc:'Associer votre thèse à une autorité irréprochable pour vos publics cibles.', risk:1 },
+  { name:'Unir les adversaires', desc:'Minimiser les divergences pour montrer que tout s\'accorde avec votre thèse.', risk:1 },
+  { name:'Mener l\'enquête avec le public', desc:'Guider le public vers la meilleure thèse via un raisonnement logique.', risk:1 },
+  { name:'Interrogatoire de l\'adversaire', desc:'Focaliser l\'attention sur l\'adversaire pour dévoiler ses motivations.', risk:2 },
+  { name:'Tirer une leçon de l\'histoire', desc:'Replacer la controverse dans un contexte historique qui aboutit à votre thèse.', risk:2 },
+  { name:'Projeter dans l\'avenir', desc:'Prophétiser un avenir où votre thèse règne — ou l\'adverse amène le chaos.', risk:2 },
+  { name:'Position victimaire', desc:'Justifier votre thèse par le drame vécu par d\'autres.', risk:2 },
+  { name:'Dénoncer un scandale', desc:'Transformer le débat en dénonciation salutaire — l\'adversaire devient complice.', risk:2 },
+  { name:'Recourir à l\'étranger', desc:'Utiliser un modèle étranger comme arbitre pour votre thèse.', risk:2 },
+  { name:'S\'abstraire vers la réalité', desc:'Renvoyer les principes vers la problématique des vraies personnes.', risk:2 },
+  { name:'S\'extraire vers les principes', desc:'Revenir aux fondamentaux — démocratie, État de droit — comme clé de voûte.', risk:2 },
+  { name:'S\'appuyer sur des données objectives', desc:'Faits incontestables répétés pour ancrer dans la mémoire du public.', risk:1 },
+  { name:'Déjouer le sens des mots', desc:'Montrer que l\'adversaire manipule le débat par des formules inexactes.', risk:2 },
+  { name:'Marteler par répétition (anaphore)', desc:'Utiliser une anaphore qui revient sans cesse au même argument.', risk:1 },
+  { name:'Pointer la contradiction adverse', desc:'Enfermer l\'adversaire dans une de ses contradictions.', risk:1 },
+  { name:'Distendre l\'argumentaire adverse', desc:'Pousser un argument adverse à l\'absurde.', risk:3 },
+  { name:'Amplifier par une analogie', desc:'Rapprocher un argument d\'un élément étranger pour lui donner de la force.', risk:2 },
+  { name:'Coup de théâtre', desc:'Apporter une preuve soudaine au moment opportun.', risk:2 },
+  { name:'Assumer la thèse adverse avec conditions', desc:'Accepter en apparence la thèse adverse tout en fixant des conditions qui mènent à votre triomphe.', risk:3 },
+  { name:'Refuser les leviers — jouer la vérité', desc:'Dévoiler la stratégie adverse et se poser comme seul garant de la vérité.', risk:1 },
+  // Artifices
+  { name:'Artifice : par le haut', desc:'Attaquer le rôle incarné par l\'adversaire, pas ses arguments. S\'il joue l\'empathie : dévoiler la posture.', risk:2, artifice:true },
+  { name:'Artifice : par l\'arrière', desc:'Dévoiler le levier rhétorique utilisé — montrer les coulisses de la manipulation.', risk:2, artifice:true },
+  { name:'Artifice : par le côté', desc:'Attaquer sur un argument qu\'il n\'a pas utilisé mais aurait dû — faire croire que c\'est lui qui cache le sujet.', risk:2, artifice:true },
+  { name:'Artifice : par le dessous', desc:'Coup bas sans s\'exposer sur le fond (Schopenhauer). Une seule utilisation possible.', risk:3, artifice:true },
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let mode = 'simple';
+let path = [];
+let state = {
+  debateType:'', subjectCentre:'', subjectContext:'',
+  publicType:'', targets:[],
+  posture:'', myArgs:[], advArgs:[],
+  tactic:'', primaryRole:'', secondaryRole:'',
+  leviers:[], // [{name, linkedArg}]
+  thesis:{accroche:'',dev:'',conclu:''},
+  counterArgs:{} // argText -> {strategy, counter}
+};
+
+const STEP_IDS = ['s1','s2','s3','s3b','s4','s5','s6','s7counter','s7','result'];
+const STEP_TOTAL = 9;
+const STEP_N = {s1:1,s2:2,s3:3,s3b:4,s4:5,s5:6,s6:7,s7counter:8,s7:9,result:9};
+
+// ============================================================
+// PAGE / MODE
+// ============================================================
+function showPage(name, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function setMode(m){
+  mode=m;
+  document.getElementById('btn-simple').classList.toggle('active',m==='simple');
+  document.getElementById('btn-advanced').classList.toggle('active',m==='advanced');
+  document.querySelectorAll('.adv-only').forEach(el=>el.style.display=m==='advanced'?'block':'none');
+  document.querySelectorAll('.simple-only').forEach(el=>el.style.display=m==='simple'?'block':'none');
+  // update step numbers display
+  updateStepNumbers();
+}
+
+function updateStepNumbers(){
+  // In simple mode steps go 1-5 (no s6 leviers, no s7 thesis detail)
+  // In advanced mode steps go 1-7
+  // Just show étape n/total based on STEP_N
+  STEP_IDS.forEach(id=>{
+    const el = document.getElementById(id+'-num');
+    if(el && STEP_N[id]) el.textContent = 'Étape '+STEP_N[id]+' / '+STEP_TOTAL;
+  });
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function updateProgress(stepId){
+  const n = STEP_N[stepId]||0;
+  document.getElementById('progress').style.width=(n/STEP_TOTAL*100)+'%';
+}
+
+function updateBreadcrumb(){
+  const bc=document.getElementById('breadcrumb');
+  if(!path.length){bc.innerHTML='';return;}
+  let html='';
+  path.forEach((p,i)=>{
+    if(i>0) html+='<span class="crumb-arrow">›</span>';
+    html+=`<span class="crumb">${p.label}</span>`;
+  });
+  html+=`<button class="btn-back" onclick="goBack()">← Retour</button>`;
+  bc.innerHTML=html;
+}
+
+function showStep(id){
+  document.querySelectorAll('#page-tree .step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  updateProgress(id);
+  window.scrollTo({top:document.querySelector('.main').offsetTop-80,behavior:'smooth'});
+  if(id==='s3'){ buildS3Visu(); }
+  if(id==='s3b'){ buildS3bVisu(); }
+  if(id==='s4'){ buildS4Visu(); }
+  if(id==='s5'){ buildRoleGrid(); buildS5Visu(); }
+  if(id==='s6'){ buildLevierList(); }
+  if(id==='s7counter'){ buildCounterList(); }
+  if(id==='s7'){ buildS7Visu(); }
+  if(id==='result'){ buildResult(); }
+}
+
+// ============================================================
+// MODAL
+// ============================================================
+function openModal(html){
+  document.getElementById('modalContent').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(e){
+  if(e && e.target !== document.getElementById('modalOverlay') && e.type==='click') return;
+  document.getElementById('modalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function showSubjectDetail(){
+  openModal(`
+    <div class="modal-badge gold">Analyse du sujet</div>
+    <div class="modal-title">${state.debateType||'Type de débat'}</div>
+    ${state.subjectCentre?`<div class="modal-section"><h4>Centre de gravité du débat</h4><p>${state.subjectCentre}</p></div>`:''}
+    ${state.subjectContext?`<div class="modal-section"><h4>Contexte de l'argumentaire</h4><p>${state.subjectContext}</p></div>`:''}
+    ${!state.subjectCentre&&!state.subjectContext?'<p style="color:var(--muted);font-style:italic">Aucune analyse saisie — revenez à l\'étape 1 en mode avancé.</p>':''}
+  `);
+}
+function showRoleDetail(which){
+  const key = which==='primary' ? state.primaryRole : state.secondaryRole;
+  const role = ROLES.find(r=>r.key===key)||{};
+  openModal(`
+    <div class="modal-badge gold">${which==='primary'?'Rôle principal':'Rôle secondaire'}</div>
+    <div class="modal-title">${key}</div>
+    <div class="modal-section"><h4>Tagline</h4><p style="font-style:italic">${role.tagline||''}</p></div>
+    ${role.attitude?`<div class="modal-section"><h4>Posture & attitude</h4><ul>${role.attitude.map(a=>`<li>${a}</li>`).join('')}</ul></div>`:''}
+    ${role.leviers?`<div class="modal-section"><h4>Leviers recommandés</h4><ul>${role.leviers.map(l=>`<li>${l}</li>`).join('')}</ul></div>`:''}
+    ${role.risques?`<div class="modal-section"><h4>Risques</h4><ul>${role.risques.map(r=>`<li>${r}</li>`).join('')}</ul></div>`:''}
+  `);
+}
+function showTargetDetail(i){
+  const t = state.targets[i];
+  if(!t) return;
+  const L={favorable:'Favorable',indecis:'Indécis',defavorable:'Défavorable'};
+  // args linked to this target
+  const linkedMy = state.myArgs.filter(a=>a.targets&&a.targets.includes(i));
+  const linkedAdv = state.advArgs.filter(a=>a.targets&&a.targets.includes(i));
+  openModal(`
+    <div class="modal-badge ${t.type}">${L[t.type]}</div>
+    <div class="modal-title">${t.name}</div>
+    ${t.profil?`<div class="modal-section"><h4>Profil</h4><p>${t.profil}</p></div>`:''}
+    ${t.comment?`<div class="modal-section"><h4>Ce qu'ils pensent / motivations</h4><p>${t.comment}</p></div>`:''}
+    ${linkedMy.length?`<div class="modal-section"><h4>Mes arguments ciblés ici</h4><ul>${linkedMy.map(a=>`<li>${a.text} <em style="color:var(--muted)">(${a.strength})</em></li>`).join('')}</ul></div>`:''}
+    ${linkedAdv.length?`<div class="modal-section"><h4>Arguments adverses ciblés ici</h4><ul>${linkedAdv.map(a=>`<li>${a.text} <em style="color:var(--muted)">(${a.strength})</em></li>`).join('')}</ul></div>`:''}
+  `);
+}
+function showArgDetail(side, i){
+  const arr = side==='my' ? state.myArgs : state.advArgs;
+  const a = arr[i];
+  if(!a) return;
+  const L={fort:'Fort',moyen:'Moyen',faible:'Faible'};
+  const title = side==='my' ? 'Mon argument' : 'Argument adverse';
+  // find associated leviers
+  const linked = state.leviers.filter(lv => lv.linkedArgs && lv.linkedArgs.some(x => x.includes(a.text)));
+  openModal(`
+    <div class="modal-badge ${a.strength}">${L[a.strength]}</div>
+    <div class="modal-title">${a.text}</div>
+    <div class="modal-section"><h4>Type</h4><p>${title}</p></div>
+    ${linked.length?`<div class="modal-section"><h4>Leviers associés</h4><ul>${linked.map(lv=>`<li>${lv.name}</li>`).join('')}</ul></div>`:''}
+    ${side==='adv' && state.counterArgs[a.text]?`
+      <div class="modal-section"><h4>Stratégie de réponse</h4><p>${state.counterArgs[a.text].strategy||'—'}</p></div>
+      <div class="modal-section"><h4>Ma contre-réplique</h4><p>${state.counterArgs[a.text].counter||'—'}</p></div>
+    `:''}
+  `);
+}
+function showLevierDetail(i){
+  const lv = state.leviers[i];
+  if(!lv) return;
+  const full = LEVIERS.find(l=>l.name===lv.name);
+  const riskLabel={1:'✓ Éthique',2:'~ Discutable',3:'⚠ Risqué'};
+  openModal(`
+    <div class="modal-badge gold">Levier</div>
+    <div class="modal-title">${lv.name}</div>
+    ${full?`<div class="modal-section"><h4>Description</h4><p>${full.desc}</p></div>`:''}
+    ${full?`<div class="modal-section"><h4>Niveau éthique</h4><p>${riskLabel[full.risk]}</p></div>`:''}
+    ${lv.linkedArgs&&lv.linkedArgs.length?`<div class="modal-section"><h4>Arguments associés</h4><ul>${lv.linkedArgs.map(a=>`<li>${a.replace(/^(MY:|ADV:)/,'')}</li>`).join('')}</ul></div>`:''}
+  `);
+}
+
+function goTo(targetId, label, btn){
+  // save state from current step if needed
+  const cur = document.querySelector('#page-tree .step.active');
+  if(cur && cur.id==='s1'){
+    state.debateType = state.debateType || label;
+    if(mode==='advanced'){
+      state.subjectCentre = document.getElementById('subject-centre').value.trim();
+      state.subjectContext = document.getElementById('subject-context').value.trim();
+    }
+  }
+  if(btn) {
+    const siblings = btn.closest('.choices');
+    if(siblings) siblings.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+  }
+  const fromId = cur ? cur.id : 's1';
+  path.push({stepId:fromId, label});
+  updateBreadcrumb();
+  updateSidebar();
+  showStep(targetId);
+}
+
+function goBack(){
+  if(!path.length) return;
+  const last=path.pop();
+  updateBreadcrumb();
+  showStep(last.stepId);
+}
+
+function restart(){
+  path=[];
+  state={debateType:'',subjectCentre:'',subjectContext:'',publicType:'',targets:[],posture:'',myArgs:[],advArgs:[],tactic:'',primaryRole:'',secondaryRole:'',leviers:[],thesis:{accroche:'',dev:'',conclu:''},counterArgs:{}};
+  document.querySelectorAll('#page-tree .step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('s1').classList.add('active');
+  document.getElementById('progress').style.width='0%';
+  updateBreadcrumb();
+  updateSidebar();
+  // reset selections
+  document.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+  document.querySelectorAll('.tactic-card').forEach(c=>c.classList.remove('selected'));
+}
+
+// ============================================================
+// STEP 1 : debate type selection
+// ============================================================
+function selectDebateType(label, btn){
+  state.debateType = label;
+  btn.closest('.choices').querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  updateSidebar();
+  if(mode==='simple') goTo('s2', label, null);
+  // advanced: user sees the extra fields, clicks "Étape suivante" button
+}
+
+// ============================================================
+// STEP 2 : TARGETS
+// ============================================================
+let currentTargetType='';
+function selectTargetType(type){
+  currentTargetType=type;
+  document.querySelectorAll('.ttype-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('tbtn-'+type).classList.add('selected');
+  document.getElementById('target-form').classList.add('active');
+}
+function addTarget(){
+  const name=document.getElementById('tname').value.trim();
+  const profil=document.getElementById('tprofil').value.trim();
+  const comment=document.getElementById('tcomment').value.trim();
+  if(!name||!currentTargetType) return;
+  state.targets.push({type:currentTargetType,name,profil,comment});
+  renderTargetList();
+  updateSidebar();
+  document.getElementById('tname').value='';
+  document.getElementById('tprofil').value='';
+  document.getElementById('tcomment').value='';
+  document.getElementById('target-form').classList.remove('active');
+  document.querySelectorAll('.ttype-btn').forEach(b=>b.classList.remove('selected'));
+  currentTargetType='';
+}
+function removeTarget(i){
+  state.targets.splice(i,1);
+  renderTargetList();
+  updateSidebar();
+}
+function renderTargetList(){
+  const el=document.getElementById('target-list');
+  if(!state.targets.length){el.innerHTML='<div class="arg-empty">Aucune cible ajoutée.</div>';return;}
+  const L={favorable:'Favorable',indecis:'Indécis',defavorable:'Défavorable'};
+  el.innerHTML=state.targets.map((t,i)=>`
+    <div class="titem ${t.type}">
+      <div class="titem-body">
+        <strong>${t.name}</strong>
+        ${t.profil?`<div class="tprofil">${t.profil}</div>`:''}
+        ${t.comment?`<div class="tcomment">${t.comment}</div>`:''}
+      </div>
+      <span class="tbadge ${t.type}">${L[t.type]}</span>
+      <button class="btn-del" onclick="removeTarget(${i})">×</button>
+    </div>`).join('');
+}
+function advFromTargets(){
+  if(!state.targets.length) return;
+  const types=[...new Set(state.targets.map(t=>t.type))];
+  state.publicType=types.map(t=>({favorable:'Favorable',indecis:'Indécis',defavorable:'Défavorable'}[t])).join(' + ');
+  goTo('s3', state.publicType, null);
+}
+
+// ============================================================
+// STEP 3 : ARGS
+// ============================================================
+function buildS3Visu(){
+  if(!state.targets.length) return;
+  const el=document.getElementById('s3-targets-visu');
+  const c=document.getElementById('s3-targets-content');
+  el.style.display='block';
+  const L={favorable:'Favorable',indecis:'Indécis',defavorable:'Défavorable'};
+  c.innerHTML=state.targets.map(t=>`
+    <div style="display:flex;gap:.5rem;align-items:flex-start;padding:.35rem 0;border-bottom:1px dotted var(--border);font-size:.82rem;">
+      <span class="tbadge ${t.type}">${L[t.type]}</span>
+      <span><strong>${t.name}</strong>${t.comment?' — <em style="color:var(--muted)">'+t.comment+'</em>':''}</span>
+    </div>`).join('');
+}
+function buildS3bVisu(){
+  const el = document.getElementById('s3b-myargs-content');
+  if(!el) return;
+  const L={fort:'Fort',moyen:'Moyen',faible:'Faible'};
+  const linked = state.myArgs.filter(a => a.targets && a.targets.length > 0);
+  if(!linked.length){ el.innerHTML='<div class="arg-empty">Aucun argument associé à une cible (étape 3a).</div>'; return; }
+  el.innerHTML = linked.map(a=>`
+    <div style="display:flex;gap:.5rem;align-items:center;padding:.3rem 0;border-bottom:1px dotted var(--border);font-size:.95rem;">
+      <span class="abadge ${a.strength}" style="font-size:.6rem;">${L[a.strength]}</span>
+      <span style="flex:1">${a.text}</span>
+      <span style="font-size:.78rem;color:#6a8a60">→ ${a.targets.map(ti=>state.targets[ti]?state.targets[ti].name:'').filter(Boolean).join(', ')}</span>
+    </div>`).join('');
+}
+function toggleArgTarget(side, argIdx, targetIdx, checked){
+  const arr = side==='my' ? state.myArgs : state.advArgs;
+  if(!arr[argIdx]) return;
+  if(!arr[argIdx].targets) arr[argIdx].targets = [];
+  if(checked){ if(!arr[argIdx].targets.includes(targetIdx)) arr[argIdx].targets.push(targetIdx); }
+  else { arr[argIdx].targets = arr[argIdx].targets.filter(t=>t!==targetIdx); }
+  updateSidebar();
+}
+
+function addArg(side){
+  const inId=side==='my'?'myArgIn':'advArgIn';
+  const stId=side==='my'?'myArgStr':'advArgStr';
+  const input=document.getElementById(inId);
+  const text=input.value.trim();
+  if(!text) return;
+  const strength=document.getElementById(stId).value;
+  if(side==='my') state.myArgs.push({text,strength,targets:[]});
+  else state.advArgs.push({text,strength,targets:[]});
+  renderArgList(side);
+  updateSidebar();
+  input.value='';input.focus();
+}
+function removeArg(side,i){
+  if(side==='my') state.myArgs.splice(i,1);
+  else state.advArgs.splice(i,1);
+  renderArgList(side);
+  updateSidebar();
+}
+function renderArgList(side){
+  const arr=side==='my'?state.myArgs:state.advArgs;
+  const elId=side==='my'?'myArgList':'advArgList';
+  const el=document.getElementById(elId);
+  if(!arr.length){el.innerHTML=`<div class="arg-empty">Aucun argument</div>`;return;}
+  const L={fort:'Fort',moyen:'Moyen',faible:'Faible'};
+  // build target options for association (only for my args)
+  const targetOpts = state.targets.length
+    ? state.targets.map((t,ti)=>`<label style="display:inline-flex;align-items:center;gap:.3rem;margin:.15rem .4rem .15rem 0;font-size:.82rem;cursor:pointer;"><input type="checkbox" value="${ti}" style="accent-color:var(--gold);"> ${t.name}</label>`).join('')
+    : '<span style="font-size:.78rem;color:var(--muted);font-style:italic">Aucune cible définie</span>';
+  el.innerHTML=arr.map((a,i)=>`
+    <div class="arg-item ${a.strength}">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:${side==='my'&&state.targets.length?'.4rem':'0'}">
+          <span class="atext">${a.text}</span>
+          <span class="abadge">${L[a.strength]}</span>
+          <button class="btn-del" onclick="removeArg('${side}',${i})">×</button>
+        </div>
+        ${(side==='my'||side==='adv')&&state.targets.length?`
+          <div style="display:flex;flex-wrap:wrap;gap:.1rem;padding-top:.2rem;border-top:1px dotted var(--border);">
+            <span style="font-family:'DM Mono',monospace;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-right:.3rem;line-height:2;">Cibles :</span>
+            ${state.targets.map((t,ti)=>`
+              <label style="display:inline-flex;align-items:center;gap:.25rem;margin:.1rem .3rem .1rem 0;font-size:.82rem;cursor:pointer;">
+                <input type="checkbox" ${(a.targets||[]).includes(ti)?'checked':''} onchange="toggleArgTarget('${side}',${i},${ti},this.checked)" style="accent-color:var(--gold);"> ${t.name}
+              </label>`).join('')}
+          </div>`:''}
+      </div>
+    </div>`).join('');
+}
+function advFromArgs(){
+  const myStrong=state.myArgs.filter(a=>a.strength==='fort').length;
+  const advWeak=state.advArgs.filter(a=>a.strength==='faible').length;
+  if(myStrong>0&&advWeak>0) state.posture='Combiné';
+  else if(myStrong>0) state.posture='Attaquant';
+  else if(advWeak>0) state.posture='Assiégeant';
+  else state.posture='Défenseur';
+  goTo('s4',state.posture,null);
+}
+
+// ============================================================
+// STEP 4 : TACTIC
+// ============================================================
+function buildS4Visu(){
+  const el=document.getElementById('s4-args-visu');
+  const c=document.getElementById('s4-args-content');
+  const myFiltered=state.myArgs.filter(a=>a.targets&&a.targets.length>0);
+  const advFiltered=state.advArgs.filter(a=>a.targets&&a.targets.length>0);
+  if(!myFiltered.length&&!advFiltered.length) return;
+  el.style.display='block';
+  const L={fort:'Fort',moyen:'Moyen',faible:'Faible'};
+  const renderMini=(arr,title)=>`<div><div style="font-family:'DM Mono',monospace;font-size:.68rem;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;">${title}</div>${arr.length?arr.map(a=>`<div style="display:flex;gap:.4rem;align-items:center;padding:.25rem 0;border-bottom:1px dotted var(--border);font-size:.9rem;"><span class="abadge ${a.strength}" style="font-size:.6rem;">${L[a.strength]}</span>${a.text}</div>`).join(''):'<div class="arg-empty">—</div>'}</div>`;
+  c.innerHTML=renderMini(myFiltered,'Mes arguments')+renderMini(advFiltered,'Arguments adverses');
+}
+function selectTactic(card,name){
+  document.querySelectorAll('.tactic-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  state.tactic=name;
+  document.getElementById('btnNextTactic').disabled=false;
+  updateSidebar();
+}
+function advFromTactic(){
+  if(!state.tactic) return;
+  goTo('s5',state.tactic,null);
+}
+
+// ============================================================
+// STEP 5 : ROLE(S)
+// ============================================================
+function buildRoleGrid(){
+  const grid=document.getElementById('roleGrid');
+  grid.innerHTML=ROLES.map(r=>{
+    const isPri=state.primaryRole===r.key;
+    const isSec=state.secondaryRole===r.key;
+    return `<div class="role-card ${isPri?'primary':isSec?'secondary':''}" onclick="toggleRole('${r.key.replace(/'/g,"\\'")}',this)">
+      ${isPri?'<span class="role-badge primary">Principal</span>':isSec?'<span class="role-badge secondary">Secondaire</span>':''}
+      <span class="rlabel">Rôle</span>
+      <h5>${r.key}</h5>
+      <p>${r.desc}</p>
+    </div>`;
+  }).join('');
+}
+function toggleRole(key, card){
+  if(state.primaryRole===key){
+    state.primaryRole=''; state.secondaryRole='';
+  } else if(state.secondaryRole===key){
+    state.secondaryRole='';
+  } else if(!state.primaryRole){
+    state.primaryRole=key;
+  } else if(!state.secondaryRole&&state.primaryRole!==key){
+    state.secondaryRole=key;
+  } else {
+    state.primaryRole=key; state.secondaryRole='';
+  }
+  buildRoleGrid();
+  document.getElementById('btnNextRole').disabled=!state.primaryRole;
+  updateSidebar();
+}
+function buildS5Visu(){
+  const el=document.getElementById('s5-visu');
+  const c=document.getElementById('s5-visu-content');
+  const hasData=state.targets.length||state.tactic||state.myArgs.length||state.advArgs.length;
+  if(!hasData){el.style.display='none';return;}
+  el.style.display='block';
+  const L={fort:'Fort',moyen:'Moyen',faible:'Faible'};
+  const TL={favorable:'Favorable',indecis:'Indécis',defavorable:'Défavorable'};
+  const TC={favorable:'#1e5c2a',indecis:'#7a6a50',defavorable:'#8b2318'};
+  c.innerHTML=`
+    ${state.targets.length?`
+      <div style="margin-bottom:.9rem;">
+        <div style="font-family:'DM Mono',monospace;font-size:.68rem;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem;letter-spacing:.12em;">Cibles (${state.targets.length})</div>
+        ${state.targets.map(t=>`
+          <div style="display:flex;gap:.7rem;align-items:flex-start;padding:.4rem 0;border-bottom:1px dotted var(--border);">
+            <span style="font-family:'DM Mono',monospace;font-size:.65rem;text-transform:uppercase;color:${TC[t.type]};flex-shrink:0;padding-top:.1rem;">${TL[t.type]}</span>
+            <div>
+              <strong style="font-size:.95rem;">${t.name}</strong>
+              ${t.profil?`<div style="font-size:.82rem;color:var(--muted)">${t.profil}</div>`:''}
+              ${t.comment?`<div style="font-size:.82rem;font-style:italic;color:var(--muted);line-height:1.5;">${t.comment}</div>`:''}
+            </div>
+          </div>`).join('')}
+      </div>`:''}
+    ${state.tactic?`<div style="margin-bottom:.7rem;"><span style="font-family:'DM Mono',monospace;font-size:.68rem;text-transform:uppercase;color:var(--gold);letter-spacing:.12em;">Tactique</span><br><span style="font-size:.95rem;font-weight:600;">${state.tactic}</span></div>`:''}
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin-top:.4rem;">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:.68rem;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;letter-spacing:.12em;">Mes arguments (liés à une cible)</div>
+        ${state.myArgs.filter(a=>a.targets&&a.targets.length>0).map(a=>`<div style="font-size:.9rem;padding:.3rem 0;border-bottom:1px dotted var(--border);"><span class="abadge ${a.strength}" style="font-size:.6rem;">${L[a.strength]}</span> ${a.text}${a.targets&&a.targets.length?`<div style="font-size:.8rem;color:#6a8a60;margin-top:.1rem;">→ ${a.targets.map(ti=>state.targets[ti]?state.targets[ti].name:'').filter(Boolean).join(', ')}</div>`:''}</div>`).join('')||'<div class="arg-empty">—</div>'}
+      </div>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:.68rem;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;letter-spacing:.12em;">Arguments adverses (liés à une cible)</div>
+        ${state.advArgs.filter(a=>a.targets&&a.targets.length>0).map(a=>`<div style="font-size:.9rem;padding:.3rem 0;border-bottom:1px dotted var(--border);"><span class="abadge ${a.strength}" style="font-size:.6rem;">${L[a.strength]}</span> ${a.text}${a.targets&&a.targets.length?`<div style="font-size:.8rem;color:#6a8a60;margin-top:.1rem;">→ ${a.targets.map(ti=>state.targets[ti]?state.targets[ti].name:'').filter(Boolean).join(', ')}</div>`:''}</div>`).join('')||'<div class="arg-empty">—</div>'}
+      </div>
+    </div>`;
+}
+function advFromRole(){
+  if(!state.primaryRole) return;
+  const label=state.secondaryRole?`${state.primaryRole} + ${state.secondaryRole}`:state.primaryRole;
+  goTo('s6',label,null);
+}
+
+// ============================================================
+// STEP 6 : LEVIERS
+// ============================================================
+function buildLevierList(){
+  const el=document.getElementById('levierList');
+  const reco=document.getElementById('s6-reco');
+  const recoText=document.getElementById('s6-reco-text');
+  const role=ROLES.find(r=>r.key===state.primaryRole);
+  const recommended=role?role.leviers:[];
+  if(recommended.length){
+    reco.style.display='block';
+    recoText.textContent=' '+recommended.join(' · ');
+  }
+  // build arg options for association
+  const allMyArgs=state.myArgs.map(a=>({text:a.text,side:'my'}));
+  const allAdvArgs=state.advArgs.map(a=>({text:a.text,side:'adv'}));
+  const allArgs=[...allMyArgs,...allAdvArgs];
+  const argOptions=allArgs.length
+    ? `<option value="">— Lier à un argument —</option>`+allMyArgs.map(a=>`<option value="MY:${a.text}">✦ Mon arg : ${a.text.substring(0,40)}${a.text.length>40?'…':''}</option>`).join('')+allAdvArgs.map(a=>`<option value="ADV:${a.text}">✕ Arg adverse : ${a.text.substring(0,35)}${a.text.length>35?'…':''}</option>`).join('')
+    : `<option value="">Aucun argument enregistré</option>`;
+  const riskLabel={1:'✓ Éthique',2:'~ Discutable',3:'⚠ Risqué'};
+  const riskClass={1:'r1',2:'r2',3:'r3'};
+  el.innerHTML=LEVIERS.map((l,i)=>{
+    const isReco=recommended.includes(l.name);
+    const existing=state.leviers.find(x=>x.name===l.name);
+    const isSelected=!!existing;
+    return `<div class="levier-item${isSelected?' selected':''}" onclick="toggleLevier(${i},this)">
+      <div class="lcheck">${isSelected?'✓':''}</div>
+      <div class="levier-body">
+        <h5>${l.name}${isReco?' ★':''}${l.artifice?' 🎭':''}</h5>
+        <p>${l.desc}</p>
+        <div class="lmeta">
+          <span class="lbadge ${riskClass[l.risk]}">${riskLabel[l.risk]}</span>
+          ${l.artifice?'<span class="lbadge artifice">Artifice de réplique</span>':''}
+        </div>
+        <div class="levier-assoc">
+          <label class="flabel" style="margin-top:.4rem">Associer à un argument</label>
+          <select id="lassoc-${i}" onchange="updateLevierAssoc(${i},this.value)" onclick="event.stopPropagation()">
+            ${argOptions}
+          </select>
+          ${allArgs.length?`<div id="lassoc-extra-${i}" style="margin-top:.3rem;display:none;">
+            <label class="flabel">Ajouter un autre argument</label>
+            <select id="lassoc2-${i}" onchange="addLevierAssoc(${i},this.value)" onclick="event.stopPropagation()">${argOptions}</select>
+          </div>`:''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  // restore selections
+  state.leviers.forEach(lv=>{
+    const idx=LEVIERS.findIndex(x=>x.name===lv.name);
+    if(idx>=0){
+      const sel=document.getElementById('lassoc-'+idx);
+      if(sel&&lv.linkedArgs&&lv.linkedArgs[0]) sel.value=lv.linkedArgs[0];
+    }
+  });
+}
+function toggleLevier(idx, el){
+  el.classList.toggle('selected');
+  const check=el.querySelector('.lcheck');
+  const name=LEVIERS[idx].name;
+  if(el.classList.contains('selected')){
+    check.innerHTML='✓';
+    if(!state.leviers.find(l=>l.name===name)) state.leviers.push({name,linkedArgs:[]});
+    el.querySelector('.levier-assoc').style.display='block';
+  } else {
+    check.innerHTML='';
+    state.leviers=state.leviers.filter(l=>l.name!==name);
+    el.querySelector('.levier-assoc').style.display='none';
+  }
+  updateSidebar();
+}
+function updateLevierAssoc(idx,val){
+  const name=LEVIERS[idx].name;
+  const lv=state.leviers.find(l=>l.name===name);
+  if(lv&&val){
+    if(!lv.linkedArgs.includes(val)) lv.linkedArgs[0]=val;
+    // show second selector
+    const extra=document.getElementById('lassoc-extra-'+idx);
+    if(extra) extra.style.display='block';
+    updateSidebar();
+  }
+}
+function addLevierAssoc(idx,val){
+  const name=LEVIERS[idx].name;
+  const lv=state.leviers.find(l=>l.name===name);
+  if(lv&&val&&!lv.linkedArgs.includes(val)){
+    lv.linkedArgs.push(val);
+    updateSidebar();
+  }
+}
+function advFromLeviers(){
+  if(mode==='advanced') goTo('s7counter','Leviers sélectionnés',null);
+  else goTo('s7','Leviers notés',null);
+}
+
+// ============================================================
+// STEP 7 : THESIS + COUNTER
+// ============================================================
+function buildS7Visu(){
+  const el=document.getElementById('s7-context-visu');
+  const c=document.getElementById('s7-context-content');
+  const role=ROLES.find(r=>r.key===state.primaryRole);
+  el.style.display='block';
+  const L={fort:'Fort',moyen:'Moyen',faible:'Faible'};
+  // build leviers + args
+  const levierLines=state.leviers.map(lv=>{
+    const linked=lv.linkedArgs.map(a=>{
+      const prefix=a.startsWith('MY:')?'✦ ':a.startsWith('ADV:')?'✕ ':'';
+      const txt=a.replace(/^(MY:|ADV:)/,'');
+      return prefix+txt.substring(0,35)+(txt.length>35?'…':'');
+    }).join(', ');
+    return `<div style="font-size:.78rem;padding:.2rem 0;border-bottom:1px dotted var(--border);"><strong>${lv.name}</strong>${linked?' → <em style="color:var(--muted)">'+linked+'</em>':''}</div>`;
+  }).join('');
+  c.innerHTML=`
+    ${state.subjectCentre?`<div style="margin-bottom:.6rem;"><span class="flabel">Centre du débat</span><p style="font-size:.82rem;line-height:1.5;">${state.subjectCentre}</p></div>`:''}
+    <div style="margin-bottom:.6rem;"><span class="flabel">Rôle(s)</span><br>
+      <span class="tag ok">${state.primaryRole||'—'}</span>
+      ${state.secondaryRole?`<span class="tag" style="margin-left:.3rem">+ ${state.secondaryRole}</span>`:''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.8rem;margin:.4rem 0;">
+      <div><div class="flabel">Mes arguments forts</div>${state.myArgs.filter(a=>a.strength==='fort').map(a=>`<div style="font-size:.78rem;padding:.2rem 0;border-bottom:1px dotted var(--border);">✦ ${a.text}</div>`).join('')||'<div class="arg-empty">—</div>'}</div>
+      <div><div class="flabel">Arguments adverses</div>${state.advArgs.map(a=>`<div style="font-size:.78rem;padding:.2rem 0;border-bottom:1px dotted var(--border);">✕ ${a.text}</div>`).join('')||'<div class="arg-empty">—</div>'}</div>
+    </div>
+    ${levierLines?`<div style="margin-top:.6rem;"><div class="flabel">Leviers associés</div>${levierLines}</div>`:''}`;
+}
+function buildCounterList(){
+  const el=document.getElementById('counter-list');
+  const L={fort:'Fort 🔴',moyen:'Moyen 🟡',faible:'Faible 🟢'};
+  if(!state.advArgs.length){
+    el.innerHTML='<div class="info-box"><strong>Info</strong>Aucun argument adverse enregistré. Revenez à l\'étape 3 pour en ajouter.</div>';
+    return;
+  }
+  el.innerHTML=state.advArgs.map((a,i)=>`
+    <div class="counter-row">
+      <div class="counter-head">
+        <div class="ch-label">Argument adverse — ${L[a.strength]}</div>
+        <div class="ch-text">"${a.text}"</div>
+      </div>
+      <div class="counter-body">
+        <label>Stratégie</label>
+        <select id="cstr-${i}" onchange="saveCounter(${i},'strategy',this.value)">
+          <option value="">— Choisir —</option>
+          <option value="Réfutation directe">Réfutation directe — contester les faits</option>
+          <option value="Jiu-jitsu">Jiu-jitsu — retourner l'argument à notre avantage</option>
+          <option value="Minimiser">Minimiser — réduire la portée</option>
+          <option value="Contextualiser">Contextualiser — déplacer le cadre</option>
+          <option value="Concéder partiellement">Concéder partiellement + imposer nos conditions</option>
+          <option value="Ignorer">Ignorer — ne mérite pas de réponse (risqué)</option>
+        </select>
+        <label style="margin-top:.5rem">Ma contre-réplique</label>
+        <textarea id="ctxt-${i}" placeholder="Comment vais-je contrer cet argument concrètement ?" onchange="saveCounter(${i},'counter',this.value)">${(state.counterArgs[a.text]&&state.counterArgs[a.text].counter)||''}</textarea>
+      </div>
+    </div>`).join('');
+  // restore strategy selects
+  state.advArgs.forEach((a,i)=>{
+    const saved=state.counterArgs[a.text];
+    if(saved&&saved.strategy){
+      const sel=document.getElementById('cstr-'+i);
+      if(sel) sel.value=saved.strategy;
+    }
+  });
+}
+function saveCounter(idx,field,val){
+  const key=state.advArgs[idx].text;
+  if(!state.counterArgs[key]) state.counterArgs[key]={strategy:'',counter:''};
+  state.counterArgs[key][field]=val;
+}
+
+// ============================================================
+// SIDEBAR
+// ============================================================
+function updateSidebar(){
+  const TL={favorable:'Favorable',indecis:'Indécis',defavorable:'Défavorable'};
+  const L={favorable:'favorable',indecis:'indecis',defavorable:'defavorable'};
+
+  // debate type
+  const dv=document.getElementById('sb-debate-val');
+  if(state.debateType){
+    dv.innerHTML=`<div class="sb-item" onclick="showSubjectDetail()">${state.debateType}<span style="float:right;color:#4a3f30;font-size:.7rem">›</span></div>`;
+  }
+
+  // subject centre
+  const subs=document.getElementById('sb-subject');
+  const subv=document.getElementById('sb-subject-val');
+  if(state.subjectCentre){
+    subs.style.display='block';
+    const preview=state.subjectCentre.substring(0,65)+(state.subjectCentre.length>65?'…':'');
+    subv.innerHTML=`<div class="sb-item" onclick="showSubjectDetail()">${preview}<span style="float:right;color:#4a3f30;font-size:.7rem">›</span></div>`;
+  } else subs.style.display='none';
+
+  // context (separate section)
+  const ctxs=document.getElementById('sb-context');
+  const ctxv=document.getElementById('sb-context-val');
+  if(state.subjectContext){
+    ctxs.style.display='block';
+    const preview=state.subjectContext.substring(0,65)+(state.subjectContext.length>65?'…':'');
+    ctxv.innerHTML=`<div class="sb-item" onclick="showSubjectDetail()">${preview}<span style="float:right;color:#4a3f30;font-size:.7rem">›</span></div>`;
+  } else ctxs.style.display='none';
+
+  // targets
+  const ts=document.getElementById('sb-targets-sec');
+  const tv=document.getElementById('sb-targets-val');
+  if(state.targets.length){
+    ts.style.display='block';
+    tv.innerHTML=state.targets.map((t,i)=>`
+      <div class="sb-item" onclick="showTargetDetail(${i})">
+        <span class="sb-label ${L[t.type]}">${TL[t.type]}</span>
+        ${t.name}${t.profil?'<br><span style="font-size:.82rem;color:#6a5a40">'+t.profil+'</span>':''}
+        <span style="float:right;color:#4a3f30;font-size:.7rem">›</span>
+      </div>`).join('');
+  } else ts.style.display='none';
+
+  // args — only show args with targets, sorted fort→moyen→faible, name+strength only
+  const ORDER={fort:0,moyen:1,faible:2};
+  const sortArgs=(arr)=>[...arr].filter(a=>a.targets&&a.targets.length>0).sort((a,b)=>ORDER[a.strength]-ORDER[b.strength]);
+  const myFiltered=sortArgs(state.myArgs);
+  const advFiltered=sortArgs(state.advArgs);
+  const as=document.getElementById('sb-args-sec');
+  if(myFiltered.length||advFiltered.length){
+    as.style.display='block';
+    const mv=document.getElementById('sb-myargs-val');
+    const av=document.getElementById('sb-advargs-val');
+    const SLABEL={fort:'🔴',moyen:'🟡',faible:'🟢'};
+    mv.innerHTML=myFiltered.length?myFiltered.map((a)=>{
+      const i=state.myArgs.indexOf(a);
+      return `<div class="sb-item" onclick="showArgDetail('my',${i})">
+        ${SLABEL[a.strength]} ${a.text}
+        <span style="float:right;color:#4a3f30;font-size:.7rem">›</span>
+      </div>`;}).join(''):'<div class="sb-empty">Aucun arg lié à une cible</div>';
+    av.innerHTML=advFiltered.length?advFiltered.map((a)=>{
+      const i=state.advArgs.indexOf(a);
+      return `<div class="sb-item" onclick="showArgDetail('adv',${i})">
+        ${SLABEL[a.strength]} ${a.text}
+        <span style="float:right;color:#4a3f30;font-size:.7rem">›</span>
+      </div>`;}).join(''):'<div class="sb-empty">Aucun arg lié à une cible</div>';
+  } else as.style.display='none';
+
+  // tactic
+  const tacs=document.getElementById('sb-tactic-sec');
+  const tacv=document.getElementById('sb-tactic-val');
+  if(state.tactic){tacs.style.display='block';tacv.textContent=state.tactic;}
+  else tacs.style.display='none';
+
+  // roles
+  const ros=document.getElementById('sb-role-sec');
+  const rov=document.getElementById('sb-role-val');
+  if(state.primaryRole){
+    ros.style.display='block';
+    rov.innerHTML=`<div class="sb-item" onclick="showRoleDetail('primary')"><span class="sb-label" style="color:var(--gold)">Principal</span>${state.primaryRole}<span style="float:right;color:#4a3f30;font-size:.7rem">›</span></div>`;
+    if(state.secondaryRole) rov.innerHTML+=`<div class="sb-item" onclick="showRoleDetail('secondary')"><span class="sb-label" style="color:#a07820">Secondaire</span>${state.secondaryRole}<span style="float:right;color:#4a3f30;font-size:.7rem">›</span></div>`;
+  } else ros.style.display='none';
+
+  // leviers
+  const ls=document.getElementById('sb-leviers-sec');
+  const lv=document.getElementById('sb-leviers-val');
+  if(state.leviers.length){
+    ls.style.display='block';
+    lv.innerHTML=state.leviers.map((l,i)=>`
+      <div class="sb-item" onclick="showLevierDetail(${i})">
+        ${l.name.substring(0,28)}${l.name.length>28?'…':''}
+        <span style="float:right;color:#4a3f30;font-size:.7rem">›</span>
+      </div>`).join('');
+  } else ls.style.display='none';
+}
+
+// ============================================================
+// RESULT
+// ============================================================
+function buildResult(){
+  // save thesis
+  if(mode==='advanced'){
+    state.thesis.accroche=document.getElementById('thesis-accroche').value;
+    state.thesis.dev=document.getElementById('thesis-dev').value;
+    state.thesis.conclu=document.getElementById('thesis-conclu').value;
+  }
+  const role=ROLES.find(r=>r.key===state.primaryRole)||{};
+  const L={fort:'Fort',moyen:'Moyen',faible:'Faible'};
+  const TL={favorable:'Favorable',indecis:'Indécis',defavorable:'Défavorable'};
+  const card=document.getElementById('resultCard');
+  card.innerHTML=`
+    <span class="rbadge">Récapitulatif</span>
+    <div class="rtitle">${role.key||'Votre argumentaire'}</div>
+    <div class="rtagline">${role.tagline||''}</div>
+    <div class="tag-row" style="margin-bottom:1rem;">
+      <span class="tag ok">${state.debateType}</span>
+      <span class="tag ok">${state.publicType||state.targets.map(t=>t.name).join(', ')}</span>
+      <span class="tag ok">${state.tactic}</span>
+      ${state.secondaryRole?`<span class="tag">+ ${state.secondaryRole}</span>`:''}
+    </div>
+    <div class="result-grid">
+      ${state.targets.length?`<div class="rsec"><h4>Cibles (${state.targets.length})</h4><ul>${state.targets.map(t=>`<li><strong>${t.name}</strong> (${TL[t.type]||t.type})${t.comment?' — '+t.comment:''}</li>`).join('')}</ul></div>`:''}
+      ${role.attitude?`<div class="rsec"><h4>Posture & attitude</h4><ul>${role.attitude.map(a=>`<li>${a}</li>`).join('')}</ul></div>`:''}
+      ${state.myArgs.filter(a=>a.strength==='fort').length?`<div class="rsec"><h4>Mes arguments forts</h4><ul>${state.myArgs.filter(a=>a.strength==='fort').map(a=>`<li>${a.text}</li>`).join('')}</ul></div>`:''}
+      ${state.leviers.length?`<div class="rsec"><h4>Leviers (${state.leviers.length})</h4><ul>${state.leviers.map(l=>`<li>${l.name}${l.linkedArgs&&l.linkedArgs.length?' → '+l.linkedArgs.map(a=>a.replace(/^(MY:|ADV:)/,'')).join(', '):''}</li>`).join('')}</ul></div>`:''}
+      ${role.risques?`<div class="rsec"><h4>Risques</h4><div class="tag-row">${role.risques.map(r=>`<span class="tag danger">${r}</span>`).join('')}</div></div>`:''}
+      ${(state.thesis.accroche||state.thesis.dev||state.thesis.conclu)?`<div class="rsec" style="grid-column:1/-1"><h4>Structure de la thèse</h4>${state.thesis.accroche?`<p style="margin-bottom:.5rem"><strong>Accroche :</strong> ${state.thesis.accroche}</p>`:''}${state.thesis.dev?`<p style="margin-bottom:.5rem"><strong>Développement :</strong> ${state.thesis.dev}</p>`:''}${state.thesis.conclu?`<p><strong>Conclusion :</strong> ${state.thesis.conclu}</p>`:''}</div>`:''}
+      ${Object.keys(state.counterArgs).filter(k=>state.counterArgs[k].counter).length?`<div class="rsec" style="grid-column:1/-1"><h4>Contre-répliques</h4><ul>${Object.entries(state.counterArgs).filter(([,v])=>v.counter).map(([k,v])=>`<li><strong>"${k}"</strong>${v.strategy?' ('+v.strategy+')':''} → ${v.counter}</li>`).join('')}</ul></div>`:''}
+    </div>`;
+}
+
+// ============================================================
+// DOWNLOAD
+// ============================================================
+function downloadFiche(){
+  const role=ROLES.find(r=>r.key===state.primaryRole)||{};
+  const L={fort:'Fort 🔴',moyen:'Moyen 🟡',faible:'Faible 🟢'};
+  const TL={favorable:'Favorable',indecis:'Indécis',defavorable:'Défavorable'};
+  const html=`<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8">
+<title>Fiche Argumentation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=DM+Mono:wght@400&display=swap');
+body{font-family:'Crimson Pro',Georgia,serif;max-width:800px;margin:2rem auto;padding:2rem;background:#faf6ee;color:#1a1208;line-height:1.7;}
+h1{font-family:'Playfair Display',serif;font-size:1.9rem;border-bottom:3px solid #c8962a;padding-bottom:.4rem;margin-bottom:.3rem;}
+.meta{font-family:'DM Mono',monospace;font-size:.65rem;letter-spacing:.12em;color:#7a6a50;text-transform:uppercase;margin-bottom:1.8rem;}
+.tagline{font-style:italic;font-size:.95rem;color:#7a6a50;border-left:3px solid #c8962a;padding-left:.9rem;margin-bottom:1.8rem;line-height:1.6;}
+h2{font-family:'DM Mono',monospace;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:#c8962a;margin:1.5rem 0 .6rem;border-bottom:1px solid #c8a96e;padding-bottom:.3rem;}
+h3{font-size:.95rem;font-weight:600;margin:.5rem 0 .2rem;}
+.block{background:#f5efe0;border:1px solid #c8a96e;padding:.7rem .9rem;margin:.4rem 0;}
+.block.fort{border-left:4px solid #8b2318;}
+.block.moyen{border-left:4px solid #c8962a;}
+.block.faible{border-left:4px solid #1e5c2a;}
+.block.favorable{border-left:4px solid #1e5c2a;}
+.block.indecis{border-left:4px solid #c8962a;}
+.block.defavorable{border-left:4px solid #8b2318;}
+p{margin:.2rem 0;font-size:.9rem;}
+.tag{display:inline-block;background:#ede4d0;padding:.15rem .5rem;font-family:'DM Mono',monospace;font-size:.58rem;color:#7a6a50;margin:.1rem;}
+.tag.ok{background:#e0ede0;color:#1e5c2a;}
+.tag.danger{background:#f5e0de;color:#8b2318;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+.footer{margin-top:3rem;text-align:center;font-family:'DM Mono',monospace;font-size:.58rem;letter-spacing:.12em;color:#c8a96e;text-transform:uppercase;border-top:1px solid #c8a96e;padding-top:.8rem;}
+@media print{body{background:white;padding:0;}}
+</style></head><body>
+<h1>${role.key||'Fiche de Préparation'}</h1>
+<div class="meta">Ars Rhetorica · ${new Date().toLocaleDateString('fr-FR')} · Mode ${mode}</div>
+${role.tagline?`<div class="tagline">${role.tagline}</div>`:''}
+
+<div class="tag ok">${state.debateType}</div>
+<div class="tag ok">${state.tactic}</div>
+${state.secondaryRole?`<div class="tag">Rôle 2 : ${state.secondaryRole}</div>`:''}
+
+${(state.subjectCentre||state.subjectContext)?`<h2>Analyse du sujet</h2>${state.subjectCentre?`<div class="block"><h3>Centre de gravité</h3><p>${state.subjectCentre}</p></div>`:''}${state.subjectContext?`<div class="block"><h3>Contexte</h3><p>${state.subjectContext}</p></div>`:''}`:''}
+
+${state.targets.length?`<h2>Cibles (${state.targets.length})</h2>${state.targets.map(t=>`<div class="block ${t.type}"><h3>${t.name} <span class="tag">${TL[t.type]||t.type}</span></h3>${t.profil?`<p style="font-size:.82rem;color:#7a6a50">${t.profil}</p>`:''}${t.comment?`<p style="font-style:italic">${t.comment}</p>`:''}</div>`).join('')}`:''}
+
+${state.myArgs.length?`<h2>Mes arguments</h2><div class="grid2">${['fort','moyen','faible'].map(s=>{const items=state.myArgs.filter(a=>a.strength===s);return items.length?items.map(a=>`<div class="block ${s}"><p>${L[s]}</p><p>${a.text}</p></div>`).join(''):''}).join('')}</div>`:''}
+
+${state.advArgs.length?`<h2>Arguments adverses</h2><div class="grid2">${['fort','moyen','faible'].map(s=>{const items=state.advArgs.filter(a=>a.strength===s);return items.length?items.map(a=>`<div class="block ${s}"><p>${L[s]}</p><p>${a.text}</p></div>`).join(''):''}).join('')}</div>`:''}
+
+${state.leviers.length?`<h2>Leviers rhétoriques</h2>${state.leviers.map(lv=>`<div class="block"><h3>${lv.name}</h3>${lv.linkedArgs&&lv.linkedArgs.length?`<p><em>→ ${lv.linkedArgs.map(a=>a.replace(/^(MY:|ADV:)/,'')).join(' · ')}</em></p>`:''}</div>`).join('')}`:''}
+
+${role.attitude?`<h2>Posture & attitude</h2>${role.attitude.map(a=>`<div class="block"><p>${a}</p></div>`).join('')}`:''}
+
+${(state.thesis.accroche||state.thesis.dev||state.thesis.conclu)?`<h2>Structure de la thèse</h2>${state.thesis.accroche?`<div class="block"><h3>① Accroche</h3><p>${state.thesis.accroche}</p></div>`:''}${state.thesis.dev?`<div class="block"><h3>② Développement</h3><p>${state.thesis.dev}</p></div>`:''}${state.thesis.conclu?`<div class="block"><h3>③ Conclusion</h3><p>${state.thesis.conclu}</p></div>`:''}`:''}
+
+${Object.keys(state.counterArgs).filter(k=>state.counterArgs[k].counter).length?`<h2>Contre-répliques</h2>${Object.entries(state.counterArgs).filter(([,v])=>v.counter).map(([k,v])=>`<div class="block"><h3>"${k}"</h3>${v.strategy?`<p><span class="tag">${v.strategy}</span></p>`:''}<p>${v.counter}</p></div>`).join('')}`:''}
+
+${role.risques?`<h2>Risques à anticiper</h2>${role.risques.map(r=>`<span class="tag danger">${r}</span>`).join(' ')}`:''}
+
+<div class="block" style="margin-top:1.5rem"><h3>Rappels clés</h3>
+<p>• Ne jamais utiliser les arguments faibles</p>
+<p>• L'adversaire n'est pas une cible — seulement le public</p>
+<p>• Votre corps parle avant vos mots : silence avant de commencer</p>
+<p>• Ne jamais rédiger un discours oral en entier — mots-clés uniquement</p>
+<p>• Cafouillage : silence, on repart. Pas d'excuse.</p>
+</div>
+<div class="footer">Ars Rhetorica — ${new Date().toLocaleString('fr-FR')}</div>
+</body></html>`;
+  const blob=new Blob([html],{type:'text/html;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='fiche-argumentation.html';a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+setMode('simple');
+updateStepNumbers();
+</script>
+</body>
+</html>
